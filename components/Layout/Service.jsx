@@ -12,6 +12,7 @@ export default function ServicesSection() {
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const [isClient, setIsClient] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
   
   const sectionRef = useRef(null);
   const cardRef = useRef(null);
@@ -21,34 +22,51 @@ export default function ServicesSection() {
   
   const isInView = useInView(sectionRef, { once: true, threshold: 0.1 });
 
-  // Constants for card dimensions
+  // ⭐ تحديث constants للكارد لتدعم جميع الأحجام
   const CARD_CONFIG = {
-    width: 320,
-    height: 450,
-    padding: 20,
+    width: isMobile ? Math.min(280, viewportSize.width - 40) : 320, // عرض متجاوب
+    height: isMobile ? 380 : 450,
+    padding: isMobile ? 10 : 20,
   };
 
-  // Initialize client-side state
+  // ⭐ تحسين client-side state initialization
   useEffect(() => {
     setIsClient(true);
+    
     const updateViewportSize = () => {
       if (typeof window !== 'undefined') {
         const width = window.innerWidth;
         const height = window.innerHeight;
         setViewportSize({ width, height });
-        setIsMobile(width < 1024); // lg breakpoint
+        
+        // تحديد نوع الجهاز
+        setIsMobile(width < 768); // sm breakpoint
+        setIsTablet(width >= 768 && width < 1024); // md to lg
       }
     };
     
     updateViewportSize();
-    window.addEventListener('resize', updateViewportSize);
-    return () => window.removeEventListener('resize', updateViewportSize);
+    
+    // تحسين event listener مع debouncing
+    const debouncedResize = () => {
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+      resizeTimeoutRef.current = setTimeout(updateViewportSize, 150);
+    };
+    
+    window.addEventListener('resize', debouncedResize);
+    return () => {
+      window.removeEventListener('resize', debouncedResize);
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
   }, []);
 
-  // Calculate optimal card position
+  // ⭐ تحسين حساب موضع الكارد
   const calculateCardPosition = useCallback((planetElement) => {
     if (!isClient || !planetElement || typeof window === 'undefined') {
-      console.log('Early return from calculateCardPosition');
       return;
     }
 
@@ -57,65 +75,69 @@ export default function ServicesSection() {
       const planetCenterX = planetRect.left + planetRect.width / 2;
       const planetCenterY = planetRect.top + planetRect.height / 2;
       
-      console.log('Planet rect:', planetRect);
-      console.log('Viewport size:', viewportSize);
+      // تحديث أبعاد الكارد حسب حجم الشاشة
+      const cardWidth = isMobile ? Math.min(280, viewportSize.width - 40) : 320;
+      const cardHeight = isMobile ? 380 : 450;
+      const padding = isMobile ? 10 : 20;
       
       const positions = [
+        // يمين الكوكب
         {
-          x: planetRect.right + 20,
-          y: planetCenterY - CARD_CONFIG.height / 2,
-          name: 'right'
+          x: planetRect.right + 15,
+          y: planetCenterY - cardHeight / 2,
+          name: 'right',
+          priority: isMobile ? 2 : 1
         },
+        // يسار الكوكب
         {
-          x: planetRect.left - CARD_CONFIG.width - 20,
-          y: planetCenterY - CARD_CONFIG.height / 2,
-          name: 'left'
+          x: planetRect.left - cardWidth - 15,
+          y: planetCenterY - cardHeight / 2,
+          name: 'left',
+          priority: isMobile ? 3 : 2
         },
+        // أسفل الكوكب
         {
-          x: planetCenterX - CARD_CONFIG.width / 2,
-          y: planetRect.bottom + 20,
-          name: 'bottom'
+          x: planetCenterX - cardWidth / 2,
+          y: planetRect.bottom + 15,
+          name: 'bottom',
+          priority: 1 // أولوية عالية على الموبايل
         },
+        // أعلى الكوكب
         {
-          x: planetCenterX - CARD_CONFIG.width / 2,
-          y: planetRect.top - CARD_CONFIG.height - 20,
-          name: 'top'
+          x: planetCenterX - cardWidth / 2,
+          y: planetRect.top - cardHeight - 15,
+          name: 'top',
+          priority: 4
         },
       ];
+
+      // ترتيب المواضع حسب الأولوية
+      positions.sort((a, b) => a.priority - b.priority);
 
       let bestPosition = positions[0];
       
       for (const pos of positions) {
-        const fitsHorizontally = pos.x >= CARD_CONFIG.padding && 
-                                pos.x + CARD_CONFIG.width <= viewportSize.width - CARD_CONFIG.padding;
-        const fitsVertically = pos.y >= CARD_CONFIG.padding && 
-                              pos.y + CARD_CONFIG.height <= viewportSize.height - CARD_CONFIG.padding;
-
-        console.log(`Testing position ${pos.name}:`, { 
-          x: pos.x, 
-          y: pos.y, 
-          fitsHorizontally, 
-          fitsVertically 
-        });
+        const fitsHorizontally = pos.x >= padding && 
+                                pos.x + cardWidth <= viewportSize.width - padding;
+        const fitsVertically = pos.y >= padding && 
+                              pos.y + cardHeight <= viewportSize.height - padding;
 
         if (fitsHorizontally && fitsVertically) {
           bestPosition = pos;
-          console.log(`Selected position: ${pos.name}`);
           break;
         }
       }
 
+      // ضمان البقاء داخل الشاشة
       const clampedX = Math.max(
-        CARD_CONFIG.padding,
-        Math.min(bestPosition.x, viewportSize.width - CARD_CONFIG.width - CARD_CONFIG.padding)
+        padding,
+        Math.min(bestPosition.x, viewportSize.width - cardWidth - padding)
       );
       
       const clampedY = Math.max(
-        CARD_CONFIG.padding,
-        Math.min(bestPosition.y, viewportSize.height - CARD_CONFIG.height - CARD_CONFIG.padding)
+        padding,
+        Math.min(bestPosition.y, viewportSize.height - cardHeight - padding)
       );
-
-      console.log('Final position:', { x: clampedX, y: clampedY });
 
       setCardPosition({
         x: clampedX,
@@ -126,10 +148,10 @@ export default function ServicesSection() {
     } catch (error) {
       console.error('Error calculating card position:', error);
     }
-  }, [isClient, viewportSize.width, viewportSize.height]);
+  }, [isClient, viewportSize.width, viewportSize.height, isMobile]);
 
+  // باقي الدوال كما هي...
   const handlePlanetHover = useCallback((serviceKey, event) => {
-    console.log('Planet hovered:', serviceKey);
     setHoveredService(serviceKey);
     setCardPersistent(true);
     
@@ -140,7 +162,6 @@ export default function ServicesSection() {
   }, [calculateCardPosition]);
 
   const handleCardDismiss = useCallback(() => {
-    console.log('Card dismissed');
     setHoveredService(null);
     setCardPersistent(false);
     setCardPosition(prev => ({ ...prev, visible: false }));
@@ -170,29 +191,32 @@ export default function ServicesSection() {
     };
   }, [isClient, cardPersistent, handleCardDismiss]);
 
-  // ⭐ دالة محسنة لحساب المواضع مع مراعاة الهواتف المحمولة
+  // ⭐ تحسين دالة حساب المواضع الدائرية
   const getCircularPosition = (index, total, radius) => {
-    // تعديل الزوايا لضمان توزيع أفضل على الهواتف المحمولة
     if (isMobile) {
-      // على الموبايل: توزيع أكثر تباعداً مع تجنب الحواف
-      const adjustedAngles = [
-        -45,  // أعلى يمين
-        45,   // أسفل يمين  
-        135,  // أسفل يسار
-        225,  // أعلى يسار
-        0     // أعلى وسط
+      // مواضع محسنة للهواتف المحمولة
+      const mobilePositions = [
+        { x: 50, y: 25 },      // أعلى وسط
+        { x: 75, y: 40 },      // أعلى يمين
+        { x: 75, y: 70 },      // أسفل يمين
+        { x: 25, y: 70 },      // أسفل يسار
+        { x: 25, y: 40 },      // أعلى يسار
       ];
-      const angle = adjustedAngles[index] || (index * 360) / total - 90;
+      
+      const position = mobilePositions[index] || { x: 50, y: 50 };
+      return { ...position, angle: 0 };
+      
+    } else if (isTablet) {
+      // تخطيط خاص بالتابلت
+      const angle = (index * 360) / total - 90;
       const radian = (angle * Math.PI) / 180;
-      
-      // تقليل نصف القطر على الموبايل لتجنب قطع النصوص
-      const mobileRadius = Math.min(radius * 0.8, 18);
-      const x = 50 + mobileRadius * Math.cos(radian);
-      const y = 50 + mobileRadius * Math.sin(radian);
-      
+      const tabletRadius = radius * 0.9; // نصف قطر أصغر قليلاً
+      const x = 50 + tabletRadius * Math.cos(radian);
+      const y = 50 + tabletRadius * Math.sin(radian);
       return { x, y, angle: angle + 90 };
+      
     } else {
-      // على الديسكتوب: التوزيع العادي
+      // تخطيط الديسكتوب العادي
       const angle = (index * 360) / total - 90;
       const radian = (angle * Math.PI) / 180;
       const x = 50 + radius * Math.cos(radian);
@@ -201,46 +225,47 @@ export default function ServicesSection() {
     }
   };
 
+  // ⭐ تحسين بيانات الخدمات مع أحجام responsive
   const services = [
     {
       key: "socialMedia",
       image: "service-image/e6f464b6-71c5-4eda-9816-2428319b08bf.jpg",
       gradient: "from-blue-500 via-purple-600 to-pink-500",
-      size: "w-16 h-16 lg:w-24 lg:h-24", // تصغير حجم الكواكب على الموبايل
+      size: "w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24", // أحجام متدرجة
     },
     {
       key: "creativeDesign",
       image: "service-image/276f27cf-d295-4ec1-97fb-719b76576184.jpg",
       gradient: "from-pink-500 via-red-500 to-orange-500",
-      size: "w-16 h-16 lg:w-24 lg:h-24",
+      size: "w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24",
     },
     {
       key: "mediaProduction",
       image: "service-image/fb7003d5-cb62-4701-85e9-791124d930da.jpg",
       gradient: "from-purple-600 via-indigo-600 to-blue-600",
-      size: "w-14 h-14 lg:w-20 lg:h-20",
+      size: "w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20",
     },
     {
       key: "paidAdvertising",
       image: "service-image/72db65bc-bf7f-496b-94be-b4dd72a70b68.jpg",
       gradient: "from-green-500 via-teal-500 to-blue-500",
-      size: "w-18 h-18 lg:w-28 lg:h-28", // الكوكب الأكبر
+      size: "w-14 h-14 sm:w-18 sm:h-18 md:w-24 md:h-24 lg:w-28 lg:h-28", // الكوكب الأكبر
     },
     {
       key: "additionalServices",
       image: "service-image/fb7003d5-cb62-4701-85e9-791124d930da.jpg",
       gradient: "from-yellow-400 via-orange-500 to-red-500",
-      size: "w-14 h-14 lg:w-19 lg:h-19",
+      size: "w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-19 lg:h-19",
     },
   ];
 
-  // ⭐ تعديل أنصاف الأقطار مع مراعاة الموبايل
-  const circularRadius = isMobile ? 18 : 25; // نصف قطر أصغر على الموبايل
+  // ⭐ نصف قطر متجاوب
+  const circularRadius = isMobile ? 15 : isTablet ? 20 : 25;
 
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen overflow-hidden section-padding"
+      className="relative min-h-screen overflow-hidden py-12 sm:py-16 md:py-20 lg:py-24"
       id="services"
     >
       {/* Background */}
@@ -256,16 +281,16 @@ export default function ServicesSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/20" />
       </div>
 
-      <div className="container-custom relative z-10">
-        {/* Header */}
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
+        {/* ⭐ Header محسن للجميع الأحجام */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-center mb-8 lg:mb-16" // تقليل المسافة على الموبايل
+          className="text-center mb-8 sm:mb-12 md:mb-16"
         >
           <h2
-            className={`text-h2 lg:text-h2-lg font-bold mb-4 lg:mb-6 text-white ${
+            className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 text-white leading-tight ${
               isRTL ? "font-cairo" : "font-sora"
             }`}
           >
@@ -273,7 +298,7 @@ export default function ServicesSection() {
           </h2>
 
           <p
-            className={`text-body lg:text-body-lg text-white/80 max-w-3xl mx-auto mb-6 lg:mb-8 px-4 ${
+            className={`text-sm sm:text-base md:text-lg lg:text-xl text-white/80 max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl mx-auto mb-6 sm:mb-8 px-4 leading-relaxed ${
               isRTL ? "font-cairo" : "font-inter"
             }`}
           >
@@ -284,7 +309,7 @@ export default function ServicesSection() {
             href="https://wa.me/971504616041"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-primary inline-flex items-center gap-3 text-button-lg shadow-2xl"
+            className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-accent-start to-accent-end text-white px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold shadow-2xl transition-all duration-300 hover:shadow-3xl"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -292,13 +317,18 @@ export default function ServicesSection() {
           </motion.a>
         </motion.div>
 
-        {/* ⭐ Solar System Universe - محسن للموبايل */}
-        <div className={`relative mx-auto max-w-7xl overflow-visible ${
+        {/* ⭐ Solar System Universe - responsive */}
+        <div className={`relative mx-auto overflow-visible ${
           isMobile 
-            ? 'h-[400px] mb-20' // ارتفاع أقل على الموبايل مع مسافة إضافية للنصوص
-            : 'h-[650px]'
+            ? 'h-[300px] sm:h-[350px] mb-16 sm:mb-20' 
+            : isTablet
+            ? 'h-[450px] sm:h-[500px] mb-12'
+            : 'h-[600px] lg:h-[650px]'
+        } ${
+          isMobile ? 'max-w-sm' : isTablet ? 'max-w-4xl' : 'max-w-7xl'
         }`}>
-          {/* Orbital Ring Visualization */}
+          
+          {/* Orbital Ring */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={isInView ? { opacity: 0.1, scale: 1 } : {}}
@@ -336,19 +366,21 @@ export default function ServicesSection() {
                   top: `${position.y}%`,
                 }}
                 onMouseEnter={(e) => handlePlanetHover(service.key, e)}
+                onClick={(e) => handlePlanetHover(service.key, e)} // إضافة onClick للموبايل
               >
                 <motion.div
                   whileHover={{
                     scale: 1.15,
                     transition: { duration: 0.3 },
                   }}
+                  whileTap={{ scale: 0.95 }} // تأثير للمس
                   className="relative group"
                 >
                   {/* Planet */}
                   <motion.div
                     animate={{
                       rotate: [0, 360],
-                      y: [0, -8, 0],
+                      y: [0, -4, 0], // تقليل الحركة على الموبايل
                     }}
                     transition={{
                       rotate: {
@@ -361,7 +393,7 @@ export default function ServicesSection() {
                         repeat: Infinity,
                       },
                     }}
-                    className={`${service.size} rounded-full shadow-2xl relative z-10 border-2 border-white/20 overflow-hidden transition-all duration-300 hover:border-white/40`}
+                    className={`${service.size} rounded-full shadow-lg sm:shadow-xl lg:shadow-2xl relative z-10 border border-white/20 sm:border-2 overflow-hidden transition-all duration-300 hover:border-white/40`}
                   >
                     <img
                       src={service.image}
@@ -372,9 +404,16 @@ export default function ServicesSection() {
                         e.target.nextSibling.style.display = "flex";
                       }}
                     />
+                    {/* Fallback gradient */}
+                                        <div
+                      className={`w-full h-full bg-gradient-to-br ${service.gradient} rounded-full flex items-center justify-center text-lg sm:text-xl md:text-2xl`}
+                      style={{ display: "none" }}
+                    >
+                      🚀
+                    </div>
                   </motion.div>
 
-                  {/* ⭐ Service Name Label - محسن للموبايل */}
+                  {/* ⭐ Service Name Label - محسن للجميع الأحجام */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{
@@ -384,15 +423,25 @@ export default function ServicesSection() {
                     }}
                     transition={{ duration: 0.4 }}
                     className={`absolute left-1/2 transform -translate-x-1/2 text-center z-20 pointer-events-none ${
-                      isMobile ? '-bottom-12' : '-bottom-16' // مسافة أقل على الموبايل
+                      isMobile 
+                        ? '-bottom-8 sm:-bottom-10' 
+                        : isTablet 
+                        ? '-bottom-12' 
+                        : '-bottom-16'
                     }`}
                   >
                     <div className={`bg-navy-dark/95 backdrop-blur-sm rounded-full border border-white/10 shadow-lg ${
-                      isMobile ? 'px-2 py-1' : 'px-4 py-2' // padding أصغر على الموبايل
+                      isMobile 
+                        ? 'px-2 py-1 sm:px-3 sm:py-1.5' 
+                        : 'px-4 py-2'
                     }`}>
                       <p
                         className={`text-white font-semibold whitespace-nowrap ${
-                          isMobile ? 'text-xs' : 'text-sm' // نص أصغر على الموبايل
+                          isMobile 
+                            ? 'text-xs sm:text-sm' 
+                            : isTablet 
+                            ? 'text-sm' 
+                            : 'text-sm lg:text-base'
                         } ${
                           isRTL ? "font-cairo" : "font-sora"
                         }`}
@@ -409,7 +458,7 @@ export default function ServicesSection() {
         </div>
       </div>
 
-      {/* Single Info Card - باقي الكود كما هو */}
+      {/* ⭐ Single Info Card - محسن للجميع الأحجام */}
       {isClient && (
         <AnimatePresence>
           {hoveredService && (cardPosition.visible || cardPersistent) && (
@@ -419,37 +468,57 @@ export default function ServicesSection() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="fixed z-[9999] w-80 backdrop-blur-xl rounded-card p-6 shadow-2xl border border-gray-border/30"
+              className={`fixed z-[9999] backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-border/30 ${
+                isMobile 
+                  ? 'p-4 sm:p-5' 
+                  : 'p-6'
+              }`}
               style={{
                 left: `${cardPosition.x}px`,
                 top: `${cardPosition.y}px`,
+                width: `${CARD_CONFIG.width}px`,
+                maxHeight: `${CARD_CONFIG.height}px`,
                 backgroundImage: 'url("/nasa-hubble-space.jpg")',
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
-                maxHeight: '400px',
                 overflow: 'hidden',
                 pointerEvents: 'auto'
               }}
             >
               {/* Card Background Overlay */}
-              <div className="absolute inset-0 bg-navy-dark/95 backdrop-blur-xl rounded-card" />
+              <div className="absolute inset-0 bg-navy-dark/95 backdrop-blur-xl rounded-2xl" />
               
               {/* Close Button */}
               <button
                 onClick={handleCardDismiss}
-                className="absolute top-3 right-3 w-8 h-8 bg-red-500/20 hover:bg-red-500/40 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all duration-200 z-20"
+                className={`absolute z-20 bg-red-500/20 hover:bg-red-500/40 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all duration-200 ${
+                  isMobile 
+                    ? 'top-2 right-2 w-6 h-6' 
+                    : 'top-3 right-3 w-8 h-8'
+                }`}
                 title={isRTL ? "إغلاق" : "Close"}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg 
+                  width={isMobile ? "12" : "16"} 
+                  height={isMobile ? "12" : "16"} 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2"
+                >
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
               
               <div className="relative z-10">
                 {/* Service Header */}
-                <div className="flex items-start gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0">
+                <div className={`flex items-start gap-3 ${
+                  isMobile ? 'mb-3' : 'mb-4'
+                }`}>
+                  <div className={`rounded-lg overflow-hidden relative flex-shrink-0 ${
+                    isMobile ? 'w-10 h-10' : 'w-12 h-12'
+                  }`}>
                     <img
                       src={services.find(s => s.key === hoveredService)?.image}
                       alt=""
@@ -460,7 +529,9 @@ export default function ServicesSection() {
                       }}
                     />
                     <div
-                      className={`absolute inset-0 bg-gradient-to-br ${services.find(s => s.key === hoveredService)?.gradient} rounded-lg flex items-center justify-center text-xl`}
+                      className={`absolute inset-0 bg-gradient-to-br ${services.find(s => s.key === hoveredService)?.gradient} rounded-lg flex items-center justify-center ${
+                        isMobile ? 'text-lg' : 'text-xl'
+                      }`}
                       style={{ display: "none" }}
                     >
                       🚀
@@ -468,14 +539,20 @@ export default function ServicesSection() {
                   </div>
                   <div className="flex-1">
                     <h3
-                      className={`text-lg font-bold text-white mb-1 leading-tight ${
+                      className={`font-bold text-white leading-tight ${
+                        isMobile 
+                          ? 'text-base mb-1' 
+                          : 'text-lg mb-1'
+                      } ${
                         isRTL ? "font-cairo text-right" : "font-sora"
                       }`}
                     >
                       {hoveredService && t(`services.${hoveredService}.title`)}
                     </h3>
                     <p
-                      className={`text-sm text-accent-start font-medium ${
+                      className={`text-accent-start font-medium ${
+                        isMobile ? 'text-xs' : 'text-sm'
+                      } ${
                         isRTL ? "text-right" : ""
                       }`}
                     >
@@ -485,9 +562,15 @@ export default function ServicesSection() {
                 </div>
 
                 {/* Service Description */}
-                <div className="max-h-32 overflow-y-auto mb-4 scrollbar-thin scrollbar-thumb-white/20">
+                <div className={`overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 ${
+                  isMobile 
+                    ? 'max-h-24 mb-3' 
+                    : 'max-h-32 mb-4'
+                }`}>
                   <p
-                    className={`text-sm text-white leading-relaxed ${
+                    className={`text-white leading-relaxed ${
+                      isMobile ? 'text-xs' : 'text-sm'
+                    } ${
                       isRTL ? "font-cairo text-right" : "font-inter"
                     }`}
                   >
@@ -496,27 +579,35 @@ export default function ServicesSection() {
                 </div>
 
                 {/* Action Button */}
-                <div className="pt-4 border-t border-white/10">
+                <div className={`border-t border-white/10 ${
+                  isMobile ? 'pt-3' : 'pt-4'
+                }`}>
                   <motion.a
                     href="https://wa.me/971504616041"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-accent-start hover:text-accent-end transition-colors font-medium cursor-pointer"
-                    whileHover={{ x: isRTL ? -5 : 5 }}
+                    className={`inline-flex items-center gap-2 text-accent-start hover:text-accent-end transition-colors font-medium cursor-pointer ${
+                      isMobile ? 'text-xs' : 'text-sm'
+                    }`}
+                    whileHover={{ x: isRTL ? -3 : 3 }}
                   >
                     {isRTL ? "اكتشف المزيد" : "Learn More"}
                     {isRTL ? (
-                      <FaArrowLeft className="text-xs" />
+                      <FaArrowLeft className={isMobile ? "text-xs" : "text-xs"} />
                     ) : (
-                      <FaArrowRight className="text-xs" />
+                      <FaArrowRight className={isMobile ? "text-xs" : "text-xs"} />
                     )}
                   </motion.a>
                 </div>
               </div>
 
               {/* Help Text */}
-              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                <p className="text-xs text-white/50 text-center">
+              <div className={`absolute left-1/2 transform -translate-x-1/2 ${
+                isMobile ? 'bottom-1' : 'bottom-2'
+              }`}>
+                <p className={`text-white/50 text-center ${
+                  isMobile ? 'text-xs' : 'text-xs'
+                }`}>
                   {isRTL ? "انقر خارج الكارد للإغلاق" : "Click outside to close"}
                 </p>
               </div>
@@ -525,18 +616,18 @@ export default function ServicesSection() {
         </AnimatePresence>
       )}
 
-      {/* Floating Contact Buttons - Desktop */}
+      {/* ⭐ Floating Contact Buttons - Desktop محسن */}
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={isInView ? { opacity: 1, scale: 1 } : {}}
         transition={{ duration: 0.5, delay: 2 }}
-        className="fixed bottom-8 right-8 z-40 lg:block hidden"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 z-40 hidden lg:block"
       >
         <motion.a
           href="https://wa.me/971504616041"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-14 h-14 bg-accent-gradient rounded-full flex items-center justify-center text-white text-xl shadow-2xl relative overflow-hidden cursor-pointer"
+          className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-r from-accent-start to-accent-end rounded-full flex items-center justify-center text-white shadow-2xl relative overflow-hidden cursor-pointer"
           whileHover={{ scale: 1.1, rotate: 15 }}
           whileTap={{ scale: 0.9 }}
           animate={{
@@ -553,7 +644,7 @@ export default function ServicesSection() {
             },
           }}
         >
-          <span className="text-2xl">💬</span>
+          <span className="text-xl md:text-2xl">💬</span>
           <motion.div
             animate={{
               scale: [1, 1.5, 2],
@@ -569,22 +660,26 @@ export default function ServicesSection() {
         </motion.a>
       </motion.div>
 
-      {/* ⭐ Floating Contact Button - Mobile - محسن */}
+      {/* ⭐ Floating Contact Button - Mobile & Tablet محسن */}
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: 2 }}
-        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 lg:hidden"
+        className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40 lg:hidden"
       >
         <motion.a
           href="https://wa.me/971504616041"
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-accent-gradient text-white px-6 py-3 rounded-full flex items-center gap-2 text-sm font-medium shadow-2xl cursor-pointer"
+          className={`bg-gradient-to-r from-accent-start to-accent-end text-white rounded-full flex items-center gap-2 font-medium shadow-2xl cursor-pointer ${
+            isMobile 
+              ? 'px-4 py-2 text-sm' 
+              : 'px-6 py-3 text-base'
+          }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           animate={{
-            y: [0, -5, 0], // تأثير floating خفيف
+            y: [0, -3, 0],
           }}
           transition={{
             y: {
@@ -594,14 +689,25 @@ export default function ServicesSection() {
             },
           }}
         >
-          <span>💬</span>
+          <span className={isMobile ? "text-lg" : "text-xl"}>💬</span>
           {isRTL ? "تواصل معنا" : "Contact Us"}
         </motion.a>
       </motion.div>
 
-      {/* ⭐ إضافة مساحة إضافية في الأسفل على الموبايل لتجنب قطع النصوص */}
-      {isMobile && (
-        <div className="h-20 lg:hidden" aria-hidden="true" />
+      {/* ⭐ مساحة إضافية للموبايل */}
+      <div className={`lg:hidden ${
+        isMobile ? 'h-16 sm:h-20' : 'h-12'
+      }`} aria-hidden="true" />
+
+      {/* ⭐ Scroll indicator للهواتف الصغيرة */}
+      {isMobile && viewportSize.width < 360 && (
+        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30 animate-bounce">
+          <div className="bg-white/10 backdrop-blur-sm rounded-full px-3 py-1">
+            <p className="text-white text-xs">
+              {isRTL ? "مرر للأسفل" : "Scroll down"}
+            </p>
+          </div>
+        </div>
       )}
     </section>
   );
