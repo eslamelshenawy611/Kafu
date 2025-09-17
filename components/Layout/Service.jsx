@@ -11,6 +11,7 @@ export default function ServicesSection() {
   const [cardPosition, setCardPosition] = useState({ x: 0, y: 0, visible: false });
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const [isClient, setIsClient] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   const sectionRef = useRef(null);
   const cardRef = useRef(null);
@@ -22,9 +23,9 @@ export default function ServicesSection() {
 
   // Constants for card dimensions
   const CARD_CONFIG = {
-    width: 320,  // w-80 = 320px
-    height: 450, // increased estimated height
-    padding: 20, // padding from viewport edges
+    width: 320,
+    height: 450,
+    padding: 20,
   };
 
   // Initialize client-side state
@@ -32,10 +33,10 @@ export default function ServicesSection() {
     setIsClient(true);
     const updateViewportSize = () => {
       if (typeof window !== 'undefined') {
-        setViewportSize({
-          width: window.innerWidth,
-          height: window.innerHeight
-        });
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        setViewportSize({ width, height });
+        setIsMobile(width < 1024); // lg breakpoint
       }
     };
     
@@ -52,37 +53,29 @@ export default function ServicesSection() {
     }
 
     try {
-      // Get planet position relative to viewport
       const planetRect = planetElement.getBoundingClientRect();
-      
-      // Planet center coordinates
       const planetCenterX = planetRect.left + planetRect.width / 2;
       const planetCenterY = planetRect.top + planetRect.height / 2;
       
       console.log('Planet rect:', planetRect);
       console.log('Viewport size:', viewportSize);
       
-      // Preferred positions (priority order)
       const positions = [
-        // Right of planet
         {
           x: planetRect.right + 20,
           y: planetCenterY - CARD_CONFIG.height / 2,
           name: 'right'
         },
-        // Left of planet
         {
           x: planetRect.left - CARD_CONFIG.width - 20,
           y: planetCenterY - CARD_CONFIG.height / 2,
           name: 'left'
         },
-        // Below planet
         {
           x: planetCenterX - CARD_CONFIG.width / 2,
           y: planetRect.bottom + 20,
           name: 'bottom'
         },
-        // Above planet
         {
           x: planetCenterX - CARD_CONFIG.width / 2,
           y: planetRect.top - CARD_CONFIG.height - 20,
@@ -90,8 +83,7 @@ export default function ServicesSection() {
         },
       ];
 
-      // Find best position that fits in viewport
-      let bestPosition = positions[0]; // Default to right
+      let bestPosition = positions[0];
       
       for (const pos of positions) {
         const fitsHorizontally = pos.x >= CARD_CONFIG.padding && 
@@ -113,7 +105,6 @@ export default function ServicesSection() {
         }
       }
 
-      // Clamp position to viewport bounds regardless
       const clampedX = Math.max(
         CARD_CONFIG.padding,
         Math.min(bestPosition.x, viewportSize.width - CARD_CONFIG.width - CARD_CONFIG.padding)
@@ -137,21 +128,17 @@ export default function ServicesSection() {
     }
   }, [isClient, viewportSize.width, viewportSize.height]);
 
-  // Handle planet hover
-   // Handle planet hover - تعديل الدالة الموجودة
   const handlePlanetHover = useCallback((serviceKey, event) => {
     console.log('Planet hovered:', serviceKey);
     setHoveredService(serviceKey);
-    setCardPersistent(true); // ⭐ جعل الكارد ثابتاً
+    setCardPersistent(true);
     
     const planetElement = event.currentTarget;
     planetRefs.current[serviceKey] = planetElement;
     
-    // Calculate position immediately
     setTimeout(() => calculateCardPosition(planetElement), 10);
   }, [calculateCardPosition]);
 
-  // إلغاء دالة handlePlanetLeave القديمة واستبدالها بدالة جديدة
   const handleCardDismiss = useCallback(() => {
     console.log('Card dismissed');
     setHoveredService(null);
@@ -159,12 +146,10 @@ export default function ServicesSection() {
     setCardPosition(prev => ({ ...prev, visible: false }));
   }, []);
 
-  // ⭐ إضافة event listener للنقر خارج الكارد
   useEffect(() => {
     if (!isClient || !cardPersistent) return;
 
     const handleClickOutside = (event) => {
-      // التحقق من عدم النقر على الكارد نفسه أو الكواكب
       const isCardClick = cardRef.current && cardRef.current.contains(event.target);
       const isPlanetClick = Object.values(planetRefs.current).some(
         planetRef => planetRef && planetRef.contains(event.target)
@@ -175,7 +160,6 @@ export default function ServicesSection() {
       }
     };
 
-    // إضافة listener بعد تأخير صغير لتجنب الإغلاق الفوري
     const timeoutId = setTimeout(() => {
       document.addEventListener('click', handleClickOutside);
     }, 100);
@@ -185,13 +169,36 @@ export default function ServicesSection() {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [isClient, cardPersistent, handleCardDismiss]);
-  // Function to calculate circular positions
+
+  // ⭐ دالة محسنة لحساب المواضع مع مراعاة الهواتف المحمولة
   const getCircularPosition = (index, total, radius) => {
-    const angle = (index * 360) / total - 90;
-    const radian = (angle * Math.PI) / 180;
-    const x = 50 + radius * Math.cos(radian);
-    const y = 50 + radius * Math.sin(radian);
-    return { x, y, angle: angle + 90 };
+    // تعديل الزوايا لضمان توزيع أفضل على الهواتف المحمولة
+    if (isMobile) {
+      // على الموبايل: توزيع أكثر تباعداً مع تجنب الحواف
+      const adjustedAngles = [
+        -45,  // أعلى يمين
+        45,   // أسفل يمين  
+        135,  // أسفل يسار
+        225,  // أعلى يسار
+        0     // أعلى وسط
+      ];
+      const angle = adjustedAngles[index] || (index * 360) / total - 90;
+      const radian = (angle * Math.PI) / 180;
+      
+      // تقليل نصف القطر على الموبايل لتجنب قطع النصوص
+      const mobileRadius = Math.min(radius * 0.8, 18);
+      const x = 50 + mobileRadius * Math.cos(radian);
+      const y = 50 + mobileRadius * Math.sin(radian);
+      
+      return { x, y, angle: angle + 90 };
+    } else {
+      // على الديسكتوب: التوزيع العادي
+      const angle = (index * 360) / total - 90;
+      const radian = (angle * Math.PI) / 180;
+      const x = 50 + radius * Math.cos(radian);
+      const y = 50 + radius * Math.sin(radian);
+      return { x, y, angle: angle + 90 };
+    }
   };
 
   const services = [
@@ -199,36 +206,36 @@ export default function ServicesSection() {
       key: "socialMedia",
       image: "service-image/e6f464b6-71c5-4eda-9816-2428319b08bf.jpg",
       gradient: "from-blue-500 via-purple-600 to-pink-500",
-      size: "w-20 h-20 lg:w-24 lg:h-24",
+      size: "w-16 h-16 lg:w-24 lg:h-24", // تصغير حجم الكواكب على الموبايل
     },
     {
       key: "creativeDesign",
       image: "service-image/276f27cf-d295-4ec1-97fb-719b76576184.jpg",
       gradient: "from-pink-500 via-red-500 to-orange-500",
-      size: "w-20 h-20 lg:w-24 lg:h-24",
+      size: "w-16 h-16 lg:w-24 lg:h-24",
     },
     {
       key: "mediaProduction",
       image: "service-image/fb7003d5-cb62-4701-85e9-791124d930da.jpg",
       gradient: "from-purple-600 via-indigo-600 to-blue-600",
-      size: "w-16 h-16 lg:w-20 lg:h-20",
+      size: "w-14 h-14 lg:w-20 lg:h-20",
     },
     {
       key: "paidAdvertising",
       image: "service-image/72db65bc-bf7f-496b-94be-b4dd72a70b68.jpg",
       gradient: "from-green-500 via-teal-500 to-blue-500",
-      size: "w-22 h-22 lg:w-28 lg:h-28",
+      size: "w-18 h-18 lg:w-28 lg:h-28", // الكوكب الأكبر
     },
     {
       key: "additionalServices",
       image: "service-image/fb7003d5-cb62-4701-85e9-791124d930da.jpg",
       gradient: "from-yellow-400 via-orange-500 to-red-500",
-      size: "w-16 h-16 lg:w-19 lg:h-19",
+      size: "w-14 h-14 lg:w-19 lg:h-19",
     },
   ];
 
-  const circularRadius = 25;
-  const mobileRadius = 20;
+  // ⭐ تعديل أنصاف الأقطار مع مراعاة الموبايل
+  const circularRadius = isMobile ? 18 : 25; // نصف قطر أصغر على الموبايل
 
   return (
     <section
@@ -255,10 +262,10 @@ export default function ServicesSection() {
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12 lg:mb-16"
+          className="text-center mb-8 lg:mb-16" // تقليل المسافة على الموبايل
         >
           <h2
-            className={`text-h2 lg:text-h2-lg font-bold mb-6 text-white ${
+            className={`text-h2 lg:text-h2-lg font-bold mb-4 lg:mb-6 text-white ${
               isRTL ? "font-cairo" : "font-sora"
             }`}
           >
@@ -266,7 +273,7 @@ export default function ServicesSection() {
           </h2>
 
           <p
-            className={`text-body lg:text-body-lg text-white/80 max-w-3xl mx-auto mb-8 ${
+            className={`text-body lg:text-body-lg text-white/80 max-w-3xl mx-auto mb-6 lg:mb-8 px-4 ${
               isRTL ? "font-cairo" : "font-inter"
             }`}
           >
@@ -281,13 +288,16 @@ export default function ServicesSection() {
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
-            
             {t("exploreOurServices")}
           </motion.a>
         </motion.div>
 
-        {/* Solar System Universe */}
-        <div className="relative h-[500px] lg:h-[650px] mx-auto max-w-7xl overflow-visible">
+        {/* ⭐ Solar System Universe - محسن للموبايل */}
+        <div className={`relative mx-auto max-w-7xl overflow-visible ${
+          isMobile 
+            ? 'h-[400px] mb-20' // ارتفاع أقل على الموبايل مع مسافة إضافية للنصوص
+            : 'h-[650px]'
+        }`}>
           {/* Orbital Ring Visualization */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -303,39 +313,38 @@ export default function ServicesSection() {
           />
 
           {/* Service Planets */}
-{services.map((service, index) => {
-  const position = getCircularPosition(
-    index,
-    services.length,
-    circularRadius
-  );
+          {services.map((service, index) => {
+            const position = getCircularPosition(
+              index,
+              services.length,
+              circularRadius
+            );
 
-  return (
-    <motion.div
-      key={service.key}
-      initial={{ opacity: 0, scale: 0.2 }}
-      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-      transition={{
-        duration: 0.8,
-        delay: 1 + index * 0.2,
-        type: "spring",
-      }}
-      className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer"
-      style={{
-        left: `${position.x}%`,
-        top: `${position.y}%`,
-      }}
-      onMouseEnter={(e) => handlePlanetHover(service.key, e)} // ⭐ إبقاء hover فقط
-      // ⭐ إزالة onMouseLeave
-    >
-      <motion.div
-        whileHover={{
-          scale: 1.15,
-          transition: { duration: 0.3 },
-        }}
-        className="relative group"
-      >
-                {/* Planet */}
+            return (
+              <motion.div
+                key={service.key}
+                initial={{ opacity: 0, scale: 0.2 }}
+                animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                transition={{
+                  duration: 0.8,
+                  delay: 1 + index * 0.2,
+                  type: "spring",
+                }}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer"
+                style={{
+                  left: `${position.x}%`,
+                  top: `${position.y}%`,
+                }}
+                onMouseEnter={(e) => handlePlanetHover(service.key, e)}
+              >
+                <motion.div
+                  whileHover={{
+                    scale: 1.15,
+                    transition: { duration: 0.3 },
+                  }}
+                  className="relative group"
+                >
+                  {/* Planet */}
                   <motion.div
                     animate={{
                       rotate: [0, 360],
@@ -363,13 +372,9 @@ export default function ServicesSection() {
                         e.target.nextSibling.style.display = "flex";
                       }}
                     />
-                    {/* 
-                    
-                     */}
-                    {/* <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full z-10" /> */}
                   </motion.div>
 
-                  {/* Service Name Label */}
+                  {/* ⭐ Service Name Label - محسن للموبايل */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{
@@ -378,18 +383,24 @@ export default function ServicesSection() {
                       scale: hoveredService === service.key ? 0.8 : 1,
                     }}
                     transition={{ duration: 0.4 }}
-                    className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center z-20 pointer-events-none"
+                    className={`absolute left-1/2 transform -translate-x-1/2 text-center z-20 pointer-events-none ${
+                      isMobile ? '-bottom-12' : '-bottom-16' // مسافة أقل على الموبايل
+                    }`}
                   >
-                    <div className="bg-navy-dark/90 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 shadow-lg">
+                    <div className={`bg-navy-dark/95 backdrop-blur-sm rounded-full border border-white/10 shadow-lg ${
+                      isMobile ? 'px-2 py-1' : 'px-4 py-2' // padding أصغر على الموبايل
+                    }`}>
                       <p
-                        className={`text-white text-sm font-semibold whitespace-nowrap ${
+                        className={`text-white font-semibold whitespace-nowrap ${
+                          isMobile ? 'text-xs' : 'text-sm' // نص أصغر على الموبايل
+                        } ${
                           isRTL ? "font-cairo" : "font-sora"
                         }`}
                       >
                         {t(`services.${service.key}.title`)}
                       </p>
                     </div>
-                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-navy-dark/90 border-l border-t border-white/10 rotate-45" />
+                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-navy-dark/95 border-l border-t border-white/10 rotate-45" />
                   </motion.div>
                 </motion.div>
               </motion.div>
@@ -398,123 +409,123 @@ export default function ServicesSection() {
         </div>
       </div>
 
-      {/* Single Info Card with Dynamic Positioning - Fixed to body */}
-     {/* Single Info Card with Dynamic Positioning */}
-{isClient && (
-  <AnimatePresence>
-    {hoveredService && (cardPosition.visible || cardPersistent) && ( // ⭐ تعديل الشرط
-      <motion.div
-        ref={cardRef}
-        initial={{ opacity: 0, scale: 0.8, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.8, y: 20 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="fixed z-[9999] w-80 backdrop-blur-xl rounded-card p-6 shadow-2xl border border-gray-border/30"
-        style={{
-          left: `${cardPosition.x}px`,
-          top: `${cardPosition.y}px`,
-          backgroundImage: 'url("/nasa-hubble-space.jpg")',
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          maxHeight: '400px',
-          overflow: 'hidden',
-          pointerEvents: 'auto' // ⭐ تغيير لـ auto لتمكين التفاعل
-        }}
-      >
-        {/* Card Background Overlay */}
-        {/* <div className="absolute inset-0 bg-navy-dark/95 backdrop-blur-xl rounded-card" /> */}
-        
-        {/* ⭐ إضافة زر الإغلاق */}
-        <button
-          onClick={handleCardDismiss}
-          className="absolute top-3 right-3 w-8 h-8 bg-red-500/20 hover:bg-red-500/40 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all duration-200 z-20"
-          title={isRTL ? "إغلاق" : "Close"}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
-        
-        <div className="relative z-10">
-          {/* باقي محتوى الكارد كما هو... */}
-          <div className="flex items-start gap-3 mb-4">
-            <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0">
-              <img
-                src={services.find(s => s.key === hoveredService)?.image}
-                alt=""
-                className="w-full h-full object-cover rounded-lg"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  e.target.nextSibling.style.display = "flex";
-                }}
-              />
-              <div
-                className={`absolute inset-0 bg-gradient-to-br ${services.find(s => s.key === hoveredService)?.gradient} rounded-lg flex items-center justify-center text-xl`}
-                style={{ display: "none" }}
+      {/* Single Info Card - باقي الكود كما هو */}
+      {isClient && (
+        <AnimatePresence>
+          {hoveredService && (cardPosition.visible || cardPersistent) && (
+            <motion.div
+              ref={cardRef}
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="fixed z-[9999] w-80 backdrop-blur-xl rounded-card p-6 shadow-2xl border border-gray-border/30"
+              style={{
+                left: `${cardPosition.x}px`,
+                top: `${cardPosition.y}px`,
+                backgroundImage: 'url("/nasa-hubble-space.jpg")',
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                maxHeight: '400px',
+                overflow: 'hidden',
+                pointerEvents: 'auto'
+              }}
+            >
+              {/* Card Background Overlay */}
+              <div className="absolute inset-0 bg-navy-dark/95 backdrop-blur-xl rounded-card" />
+              
+              {/* Close Button */}
+              <button
+                onClick={handleCardDismiss}
+                className="absolute top-3 right-3 w-8 h-8 bg-red-500/20 hover:bg-red-500/40 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all duration-200 z-20"
+                title={isRTL ? "إغلاق" : "Close"}
               >
-                
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+              
+              <div className="relative z-10">
+                {/* Service Header */}
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0">
+                    <img
+                      src={services.find(s => s.key === hoveredService)?.image}
+                      alt=""
+                      className="w-full h-full object-cover rounded-lg"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "flex";
+                      }}
+                    />
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${services.find(s => s.key === hoveredService)?.gradient} rounded-lg flex items-center justify-center text-xl`}
+                      style={{ display: "none" }}
+                    >
+                      🚀
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h3
+                      className={`text-lg font-bold text-white mb-1 leading-tight ${
+                        isRTL ? "font-cairo text-right" : "font-sora"
+                      }`}
+                    >
+                      {hoveredService && t(`services.${hoveredService}.title`)}
+                    </h3>
+                    <p
+                      className={`text-sm text-accent-start font-medium ${
+                        isRTL ? "text-right" : ""
+                      }`}
+                    >
+                      {hoveredService && t(`services.${hoveredService}.subtitle`)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Service Description */}
+                <div className="max-h-32 overflow-y-auto mb-4 scrollbar-thin scrollbar-thumb-white/20">
+                  <p
+                    className={`text-sm text-white leading-relaxed ${
+                      isRTL ? "font-cairo text-right" : "font-inter"
+                    }`}
+                  >
+                    {hoveredService && t(`services.${hoveredService}.description`)}
+                  </p>
+                </div>
+
+                {/* Action Button */}
+                <div className="pt-4 border-t border-white/10">
+                  <motion.a
+                    href="https://wa.me/971504616041"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-accent-start hover:text-accent-end transition-colors font-medium cursor-pointer"
+                    whileHover={{ x: isRTL ? -5 : 5 }}
+                  >
+                    {isRTL ? "اكتشف المزيد" : "Learn More"}
+                    {isRTL ? (
+                      <FaArrowLeft className="text-xs" />
+                    ) : (
+                      <FaArrowRight className="text-xs" />
+                    )}
+                  </motion.a>
+                </div>
               </div>
-            </div>
-            <div className="flex-1">
-              <h3
-                className={`text-lg font-bold text-white mb-1 leading-tight ${
-                  isRTL ? "font-cairo text-right" : "font-sora"
-                }`}
-              >
-                {hoveredService && t(`services.${hoveredService}.title`)}
-              </h3>
-              <p
-                className={`text-sm text-accent-start font-medium ${
-                  isRTL ? "text-right" : ""
-                }`}
-              >
-                {hoveredService && t(`services.${hoveredService}.subtitle`)}
-              </p>
-            </div>
-          </div>
 
-          {/* Service Description */}
-          <div className="max-h-32 overflow-y-auto mb-4 scrollbar-thin scrollbar-thumb-white/20">
-            <p
-              className={`text-sm text-white leading-relaxed ${
-                isRTL ? "font-cairo text-right" : "font-inter"
-              }`}
-            >
-              {hoveredService && t(`services.${hoveredService}.description`)}
-            </p>
-          </div>
+              {/* Help Text */}
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                <p className="text-xs text-white/50 text-center">
+                  {isRTL ? "انقر خارج الكارد للإغلاق" : "Click outside to close"}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
-          {/* Action Button */}
-          <div className="pt-4 border-t border-white/10">
-            <motion.a
-              href="https://wa.me/971504616041"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-accent-start hover:text-accent-end transition-colors font-medium cursor-pointer"
-              whileHover={{ x: isRTL ? -5 : 5 }}
-            >
-              {isRTL ? "اكتشف المزيد" : "Learn More"}
-              {isRTL ? (
-                <FaArrowLeft className="text-xs" />
-              ) : (
-                <FaArrowRight className="text-xs" />
-              )}
-            </motion.a>
-          </div>
-        </div>
-
-        {/* ⭐ إضافة نص تعليمي */}
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-          <p className="text-xs text-white/50 text-center">
-            {isRTL ? "انقر خارج الكارد للإغلاق" : "Click outside to close"}
-          </p>
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-)}
-      {/* Floating Contact Buttons */}
+      {/* Floating Contact Buttons - Desktop */}
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={isInView ? { opacity: 1, scale: 1 } : {}}
@@ -558,6 +569,7 @@ export default function ServicesSection() {
         </motion.a>
       </motion.div>
 
+      {/* ⭐ Floating Contact Button - Mobile - محسن */}
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -571,14 +583,26 @@ export default function ServicesSection() {
           className="bg-accent-gradient text-white px-6 py-3 rounded-full flex items-center gap-2 text-sm font-medium shadow-2xl cursor-pointer"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          animate={{
+            y: [0, -5, 0], // تأثير floating خفيف
+          }}
+          transition={{
+            y: {
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            },
+          }}
         >
           <span>💬</span>
           {isRTL ? "تواصل معنا" : "Contact Us"}
         </motion.a>
       </motion.div>
 
-      {/* Debug info - Remove in production */}
-    
+      {/* ⭐ إضافة مساحة إضافية في الأسفل على الموبايل لتجنب قطع النصوص */}
+      {isMobile && (
+        <div className="h-20 lg:hidden" aria-hidden="true" />
+      )}
     </section>
   );
 }

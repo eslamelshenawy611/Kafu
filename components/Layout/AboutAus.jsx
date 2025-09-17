@@ -187,16 +187,7 @@ export default function AboutSection() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Link
-                href="/about-details"
-                className="inline-flex items-center gap-3 px-8 py-4 rounded-full text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
-                style={{ 
-                  background: 'linear-gradient(135deg, #ff883e, #ff3d7f)',
-                }}
-              >
-                {isRTL ? 'اعرف المزيد' : 'SEE MORE'}
-                {isRTL ? <FaArrowLeft /> : <FaArrowRight />}
-              </Link>
+            
             </motion.div>
           </motion.div>
         </div>
