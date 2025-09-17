@@ -487,7 +487,7 @@ export default function ServicesSection() {
               }}
             >
               {/* Card Background Overlay */}
-              <div className="absolute inset-0 bg-navy-dark/95 backdrop-blur-xl rounded-2xl" />
+              <div className="absolute inset-0 backdrop-blur-xl rounded-2xl" />
               
               {/* Close Button */}
               <button
