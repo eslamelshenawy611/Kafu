@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { FaPhone, FaGlobe, FaBars, FaTimes, FaWhatsapp } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,11 +9,26 @@ export default function Header() {
   const { language, toggleLanguage, t, isRTL } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+      
+      // تحديد إذا كان التمرير للأعلى أو للأسفل
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        // التمرير للأسفل - إخفاء الـ navbar
+        setIsVisible(false);
+      } else {
+        // التمرير للأعلى - إظهار الـ navbar
+        setIsVisible(true);
+      }
+      
+      setScrolled(currentScrollY > 20);
+      lastScrollY.current = currentScrollY;
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -21,10 +36,10 @@ export default function Header() {
   return (
     <motion.header
       initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
+      animate={{ y: isVisible ? 0 : -100 }}
+      transition={{ duration: 0.3 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-navy-dark/90 backdrop-blur-lg py-2 md:py-3' : 'py-3 md:py-4'
+        scrolled ? 'py-2 md:py-3' : 'py-3 md:py-4'
       }`}
     >
       <div className="container-custom">
@@ -41,8 +56,8 @@ export default function Header() {
               alt="KAFU Logo"
               className={`w-auto object-contain transition-all duration-300 ${
                 scrolled 
-                  ? 'h-[50px] sm:h-[60px] md:h-[70px]' 
-                  : 'h-[60px] sm:h-[75px] md:h-[85px]'
+                  ? 'h-[120px] sm:h-[120px] md:h-[130px]' 
+                  : 'h-[95px] sm:h-[100px] md:h-[110px]'
               }`}
               // تأثير توهج خفيف فقط
               animate={{
@@ -64,21 +79,21 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-3 lg:gap-4">
             {/* Phone Number مع أيقونة بيضاء */}
             <motion.a
-              href="tel:+962793131000"
+              href="tel:+971504616041"
               whileHover={{ scale: 1.02 }}
               className={`text-white/90 text-sm flex items-center gap-2 hover:text-white transition-colors duration-200 font-medium ${
                 isRTL ? 'flex-row-reverse' : ''
               }`}
             >
               <FaPhone className="text-white text-sm" />
-              <span dir="ltr">+962-79-313-1000</span>
+              <span dir="ltr">+971504616041</span>
             </motion.a>
 
             {/* Contact Us Button - أخضر مع أيقونة WhatsApp */}
             <motion.a
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
-              href="https://wa.me/971504616041"
+              href="https://wa.me/+971504616041"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-green-500/25"
@@ -131,7 +146,7 @@ export default function Header() {
                   className="text-white/90 flex items-center gap-2 justify-center py-2 hover:text-white transition text-sm font-medium"
                 >
                   <FaPhone className="text-white" />
-                  <span dir="ltr">+962-79-313-1000</span>
+                  <span dir="ltr">+971504616041</span>
                 </motion.a>
 
                 {/* Contact Button Mobile */}

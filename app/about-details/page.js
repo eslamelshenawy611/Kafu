@@ -265,7 +265,7 @@ export default function AboutPage() {
                   href="https://wa.me/971504616041"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#ff883e] to-purple-500 rounded-full text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center gap-3 px-8 py-4 bg[#ff883e] font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

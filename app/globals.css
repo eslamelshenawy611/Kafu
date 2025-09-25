@@ -18,7 +18,7 @@
   }
 
   body {
-    @apply antialiased overflow-x-hidden bg-navy text-white;
+    @apply antialiased overflow-x-hidden bg-white text-white ;
   }
   
   /* Focus Styles */
@@ -103,4 +103,111 @@
   .spin-once {
   animation: spin-once 0.4s linear; /* تلف لفة كاملة في 0.4 ثانية */
 }
-} 
+/* في globals.css */
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+section {
+  margin: 0 !important;
+  padding: 0;
+  display: block;
+  position: relative;
+}
+
+/* .hero-section {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+} */
+
+
+/* Smooth Section Transitions */
+/* .hero-section {
+  position: relative;
+  isolation: isolate;
+} */
+
+/* إضافة تأثير الـ glow للسيكشن بالكامل */
+/* .hero-section::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: 0;
+  right: 0;
+  height: 150px;
+  background: radial-gradient(
+    ellipse at bottom,
+    rgba(255, 149, 0, 0.15) 0%,
+    rgba(255, 149, 0, 0.08) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 1;
+} */
+
+/* Smooth scrolling between sections */
+html {
+  scroll-behavior: smooth;
+}
+
+/* لضمان الانتقال السلس بين الأقسام */
+.seamless-sections {
+  margin-bottom: -1px;
+}
+
+/* تأثير parallax خفيف للخلفية */
+/* @supports (animation-timeline: scroll()) {
+  .hero-section > div:first-child {
+    animation: parallax-bg linear both;
+    animation-timeline: scroll();
+    animation-range: 0% 100%;
+  }
+} */
+
+@keyframes parallax-bg {
+  to {
+    transform: translateY(100px);
+  }
+}
+
+/* تحسين الانتقالات على الموبايل */
+@media (max-width: 768px) {
+  .hero-section::after {
+    height: 100px;
+    bottom: -30px;
+  }
+}
+
+/* إضافة تأثير الضباب المتحرك */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 300%;
+  height: 200px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 149, 0, 0.05) 0%,
+    transparent 70%
+  );
+  animation: fog-move 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes fog-move {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  33% {
+    transform: translateX(100px) translateY(-10px);
+  }
+  66% {
+    transform: translateX(-100px) translateY(10px);
+  }
+}
+}
+ 

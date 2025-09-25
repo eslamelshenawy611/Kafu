@@ -20,7 +20,7 @@ export default function Footer() {
   const socialLinks = [
     {
       icon: FaWhatsapp,
-      href: "https://wa.me/971509256578",
+      href: "https://wa.me/+971504616041",
       color: "hover:text-[#25D366]",
       label: "WhatsApp"
     },
@@ -32,7 +32,7 @@ export default function Footer() {
     },
     {
       icon: FaEnvelope,
-      href: "mailto:marketingkafu@gmail.com",
+      href: 'mailto:marketingkafu@gmail.com', 
       color: "hover:text-[#ff883e]",
       label: "Email"
     }
@@ -66,21 +66,61 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative overflow-hidden" style={{ backgroundColor: '#000000' }}>
-      {/* Background Pattern with Orange Accent */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25% 25%, rgba(255,136,62,0.15) 0%, transparent 50%), 
-                           radial-gradient(circle at 75% 75%, rgba(255,136,62,0.1) 0%, transparent 50%)`
-        }} />
-      </div>
+    <footer className="relative overflow-hidden bg-black">
+      {/* Top Shadow for smooth transition */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-32 z-20 pointer-events-none"
+        style={{
+          background: `linear-gradient(to bottom, 
+            rgba(0,0,0,1) 0%, 
+            rgba(0,0,0,0.95) 10%,
+            rgba(0,0,0,0.8) 25%, 
+            rgba(0,0,0,0.5) 50%,
+            rgba(0,0,0,0.2) 75%,
+            transparent 100%
+          )`
+        }}
+      />
+
+      {/* Main Gradient Background - متوافق مع باقي الأقسام */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `
+            radial-gradient(ellipse at 10% 90%, rgba(232, 124, 57, 0.2) 0%, transparent 40%),
+            radial-gradient(ellipse at 90% 80%, rgba(212, 81, 19, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 0%, rgba(255, 136, 62, 0.1) 0%, transparent 60%)
+          `
+        }}
+      />
+
+      {/* Animated Gradient Overlay */}
+      <motion.div 
+        className="absolute inset-0 opacity-20"
+        animate={{ 
+          backgroundPosition: ['0% 0%', '100% 100%', '0% 0%']
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 20% 80%, rgba(255, 136, 62, 0.3) 0%, transparent 40%),
+            radial-gradient(circle at 80% 20%, rgba(74, 222, 128, 0.1) 0%, transparent 40%),
+            radial-gradient(circle at 50% 50%, rgba(212, 81, 19, 0.2) 0%, transparent 50%)
+          `,
+          backgroundSize: '200% 200%'
+        }}
+      />
 
       {/* Subtle geometric pattern */}
       <div className="absolute inset-0 opacity-5">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ff883e" strokeWidth="1"/>
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E87C39" strokeWidth="1"/>
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
@@ -103,13 +143,13 @@ export default function Footer() {
               <h3 className={`text-xl lg:text-2xl font-semibold mb-4 ${
                 isRTL ? 'font-cairo text-right' : 'font-sora text-left'
               }`}
-              style={{ color: '#ff883e' }}>
+              style={{ color: '#E87C39' }}>
                 {t('ourVision')}
               </h3>
               <p className={`leading-relaxed text-sm lg:text-base ${
                 isRTL ? 'font-cairo text-right' : 'font-inter text-left'
               }`}
-              style={{ color: '#c4c4c4' }}>
+              style={{ color: '#e0e0e0' }}>
                 {t('visionText')}
               </p>
             </motion.div>
@@ -127,11 +167,11 @@ export default function Footer() {
                 <motion.img
                   src="/LOGO_KAFU.png"
                   alt="KAFU Logo"
-                  className="h-20 lg:h-24 w-auto object-contain"
+                  className="h-32 lg:h-36 w-auto object-contain"
                   animate={{
                     filter: [
                       "brightness(1) drop-shadow(0 0 0 transparent)",
-                      "brightness(1.1) drop-shadow(0 0 20px rgba(255,136,62,0.4))",
+                      "brightness(1.1) drop-shadow(0 0 20px rgba(232, 124, 57, 0.4))",
                       "brightness(1) drop-shadow(0 0 0 transparent)"
                     ]
                   }}
@@ -143,7 +183,7 @@ export default function Footer() {
                 />
                 {/* Glow background */}
                 <div className="absolute inset-0 blur-xl -z-10 rounded-full" 
-                     style={{ background: 'radial-gradient(circle, rgba(255,136,62,0.2) 0%, transparent 70%)' }} />
+                     style={{ background: 'radial-gradient(circle, rgba(232, 124, 57, 0.2) 0%, transparent 70%)' }} />
               </div>
 
               {/* Social Media Icons */}
@@ -167,16 +207,16 @@ export default function Footer() {
                       ${social.color}
                     `}
                     style={{ 
-                      backgroundColor: 'rgba(196, 196, 196, 0.1)',
-                      borderColor: 'rgba(196, 196, 196, 0.2)'
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      borderColor: 'rgba(232, 124, 57, 0.3)'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = 'rgba(255, 136, 62, 0.2)';
-                      e.target.style.borderColor = 'rgba(255, 136, 62, 0.4)';
+                      e.currentTarget.style.backgroundColor = 'rgba(232, 124, 57, 0.2)';
+                      e.currentTarget.style.borderColor = 'rgba(232, 124, 57, 0.6)';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'rgba(196, 196, 196, 0.1)';
-                      e.target.style.borderColor = 'rgba(196, 196, 196, 0.2)';
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                      e.currentTarget.style.borderColor = 'rgba(232, 124, 57, 0.3)';
                     }}
                     aria-label={social.label}
                   >
@@ -216,24 +256,24 @@ export default function Footer() {
                         className={`flex items-center gap-3 hover:text-white transition-colors duration-300 ${
                           isRTL ? 'flex-row-reverse' : ''
                         }`}
-                        style={{ color: '#c4c4c4' }}
+                        style={{ color: '#e0e0e0' }}
                       >
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300"
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
                              style={{ 
-                               backgroundColor: 'rgba(196, 196, 196, 0.1)',
-                               color: '#ff883e'
+                               backgroundColor: 'rgba(232, 124, 57, 0.15)',
+                               color: '#E87C39'
                              }}
                              onMouseEnter={(e) => {
-                               e.target.style.backgroundColor = 'rgba(255, 136, 62, 0.2)';
+                               e.currentTarget.style.backgroundColor = 'rgba(232, 124, 57, 0.3)';
                              }}
                              onMouseLeave={(e) => {
-                               e.target.style.backgroundColor = 'rgba(196, 196, 196, 0.1)';
+                               e.currentTarget.style.backgroundColor = 'rgba(232, 124, 57, 0.15)';
                              }}>
                           <item.icon className="text-sm" />
                         </div>
                         <div className={isRTL ? 'text-right' : 'text-left'}>
                           <p className={`text-xs mb-1 ${isRTL ? 'font-cairo' : 'font-inter'}`}
-                             style={{ color: '#c4c4c4' }}>
+                             style={{ color: '#a0a0a0' }}>
                             {item.label}
                           </p>
                           <p className={`text-sm lg:text-base ${isRTL ? 'font-cairo' : 'font-inter'} ${
@@ -246,17 +286,17 @@ export default function Footer() {
                     ) : (
                       <div className={`flex items-center gap-3 ${
                         isRTL ? 'flex-row-reverse' : ''
-                      }`} style={{ color: '#c4c4c4' }}>
+                      }`} style={{ color: '#e0e0e0' }}>
                         <div className="w-10 h-10 rounded-full flex items-center justify-center"
                              style={{ 
-                               backgroundColor: 'rgba(196, 196, 196, 0.1)',
-                               color: '#ff883e'
+                               backgroundColor: 'rgba(232, 124, 57, 0.15)',
+                               color: '#E87C39'
                              }}>
                           <item.icon className="text-sm" />
                         </div>
                         <div className={isRTL ? 'text-right' : 'text-left'}>
                           <p className={`text-xs mb-1 ${isRTL ? 'font-cairo' : 'font-inter'}`}
-                             style={{ color: '#c4c4c4' }}>
+                             style={{ color: '#a0a0a0' }}>
                             {item.label}
                           </p>
                           <p className={`text-sm lg:text-base ${isRTL ? 'font-cairo' : 'font-inter'}`}>
@@ -273,7 +313,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t" style={{ borderColor: 'rgba(196, 196, 196, 0.1)' }}>
+        <div className="border-t" style={{ borderColor: 'rgba(232, 124, 57, 0.2)' }}>
           <div className="container-custom py-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               
@@ -283,10 +323,10 @@ export default function Footer() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className={`text-sm ${
+                                className={`text-sm ${
                   isRTL ? 'font-cairo text-center md:text-right' : 'font-inter text-center md:text-left'
                 }`}
-                style={{ color: '#c4c4c4' }}
+                style={{ color: '#a0a0a0' }}
               >
                 © {currentYear} KAFU. {t('allRightsReserved')}
               </motion.p>
@@ -302,14 +342,14 @@ export default function Footer() {
                 onClick={scrollToTop}
                 className="group w-12 h-12 rounded-full flex items-center justify-center text-white hover:shadow-lg transition-all duration-300"
                 style={{ 
-                  background: 'linear-gradient(135deg, #ff883e, #ff6b47)',
-                  boxShadow: '0 4px 15px rgba(255, 136, 62, 0.3)'
+                  background: 'linear-gradient(135deg, #E87C39, #d45113)',
+                  boxShadow: '0 4px 15px rgba(232, 124, 57, 0.3)'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.boxShadow = '0 8px 25px rgba(255, 136, 62, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(232, 124, 57, 0.5)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.boxShadow = '0 4px 15px rgba(255, 136, 62, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(232, 124, 57, 0.3)';
                 }}
                 aria-label="Scroll to top"
               >
@@ -322,7 +362,35 @@ export default function Footer() {
 
       {/* Bottom accent line */}
       <div className="absolute bottom-0 left-0 right-0 h-1" 
-           style={{ background: 'linear-gradient(90deg, #ff883e 0%, #ff6b47 50%, #ff883e 100%)' }} />
+           style={{ background: 'linear-gradient(90deg, transparent 0%, #E87C39 20%, #d45113 50%, #E87C39 80%, transparent 100%)' }} />
+      
+      {/* Floating particles effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${Math.random() * 3 + 1}px`,
+              height: `${Math.random() * 3 + 1}px`,
+              background: i % 2 === 0 ? '#E87C39' : '#d45113',
+              opacity: 0.2
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{
+              duration: Math.random() * 5 + 5,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+      </div>
     </footer>
   );
 }
