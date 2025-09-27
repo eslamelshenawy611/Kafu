@@ -6,26 +6,53 @@ import { motion } from 'framer-motion';
 import { 
   FaInstagram, 
   FaWhatsapp,
-  FaEnvelope
+  FaEnvelope,
+  FaTiktok,
+  FaLinkedinIn
 } from 'react-icons/fa';
 import '../../app/globals.css'; 
 
 export default function HeroSection() {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage(); // إضافة language
   const [activeService, setActiveService] = useState(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [hasVideoError, setHasVideoError] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const videoRef = useRef(null);
+  
+  // Check desktop device
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsDesktop(window.innerWidth >= 1024); 
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
 
-  const services = [
-    { key: 'it', label: 'Digital marketing' },
-    { key: 'digitalMarketing', label: 'Influencer Strategy' },
-    { key: 'branding', label: 'Event Planning & Management' },
-    { key: 'socialMedia', label: 'Media' },
-  ];
+  // Services content with translations
+  const servicesContent = {
+    en: [
+      { key: 'it', label: 'Digital Marketing' },
+      { key: 'digitalMarketing', label: 'Influencer Strategy' },
+      { key: 'branding', label: 'Event Planning & Management' },
+      { key: 'socialMedia', label: 'Media' },
+    ],
+    ar: [
+      { key: 'it', label: 'التسويق الرقمي' },
+      { key: 'digitalMarketing', label: 'استراتيجية المؤثرين' },
+      { key: 'branding', label: 'تخطيط وإدارة الفعاليات' },
+      { key: 'socialMedia', label: 'الإعلام' },
+    ]
+  };
 
+  // Get services based on current language - إذا لم يكن language متاح، استخدم isRTL
+  const services = language ? servicesContent[language] : (isRTL ? servicesContent.ar : servicesContent.en);
+
+  // Social links
   const socialLinks = [
     { 
       icon: FaInstagram, 
@@ -43,11 +70,27 @@ export default function HeroSection() {
     },
     { 
       icon: FaEnvelope, 
-      href: 'mailto:marketingkafu@gmail.com', 
+      href: isDesktop 
+        ? 'https://mail.google.com/mail/?view=cm&fs=1&to=marketingkafu@gmail.com'
+        : 'mailto:marketingkafu@gmail.com',
       label: 'Email',
       bgColor: 'bg-black/60',
       textColor: 'text-orange-500 hover:text-orange-600'    
+    }, 
+    {
+      icon: FaTiktok,
+      href: 'https://www.tiktok.com/@kafu.marketing?_t=ZS-901OYIsjVxM&_r=1', 
+      label: 'TikTok',
+      bgColor: 'bg-black/60',
+      textColor: 'text-white hover:text-gray-300'
     },
+    {
+      icon: FaLinkedinIn,
+      href: 'https://www.linkedin.com/company/109021030/admin/page-posts/published/', 
+      label: 'LinkedIn',
+      bgColor: 'bg-black/60',
+      textColor: 'text-blue-500 hover:text-blue-600'
+    }
   ];
 
   // فحص دعم الفيديو والاتصال
@@ -226,7 +269,7 @@ export default function HeroSection() {
                 <div className={`${isRTL ? 'font-roboto text-right' : 'font-cairo text-left'}`}>
                   {/* EXPLORE OUR */}
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                                      initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                     className="mb-1 md:mb-2"
@@ -250,37 +293,21 @@ export default function HeroSection() {
               </motion.div>
 
               {/* أزرار الخدمات */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
+              <div
                 className={`flex flex-wrap gap-2 md:gap-3 mb-8 md:mb-10 lg:mb-12 ${
-                  isRTL ? 'justify-end md:justify-start' : 'justify-start'
+                  isRTL ? "justify-end md:justify-start" : "justify-start"
                 }`}
               >
                 {services.map((service, index) => (
-                  <motion.button
+                  <div
                     key={service.key}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 + index * 0.1 }}
-                    whileHover={{ 
-                      y: -2, 
-                      scale: 1.02,
-                      transition: { duration: 0.2 }
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setActiveService(service.key === activeService ? null : service.key)}
-                    className={`px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5 text-xs sm:text-sm md:text-base font-medium rounded-lg transition-all duration-300 ${
-                      activeService === service.key
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 scale-105'
-                        : 'bg-black/60 backdrop-blur-sm text-white/90 hover:bg-black/70 hover:text-white border border-white/10 hover:border-white/20'
-                    }`}
+                    className="px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5 text-xs sm:text-sm md:text-base font-medium rounded-lg bg-black/60 text-white/90 border border-white/10"
+                    style={{ cursor: "default" }}
                   >
                     {service.label}
-                  </motion.button>
+                  </div>
                 ))}
-              </motion.div>
+              </div>
 
               {/* أيقونات وسائل التواصل الاجتماعي */}
               <motion.div

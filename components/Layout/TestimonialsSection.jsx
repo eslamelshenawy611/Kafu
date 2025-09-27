@@ -12,167 +12,149 @@ export default function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const testimonials = [
-    {
-      id: 1,
-      name: isRTL ? "ياسين عواد" : "Yaseen Awad",
-      gender: "male",
-      rating: 5,
-      reviewEn:
-        "Wonderful courses, luxurious place, and excellent treatment, and a professional staff ",
-      reviewAr:
-        "  دورات رائعة، مكان فاخر، ومعاملة ممتازة ، وطاقم عمل علي اعلي مستوي",
-    },
-    {
-      id: 2,
-      name: isRTL ? "د. سهام كرنة" : "Ph Siham Kfarneh",
-      gender: "female",
-      rating: 5,
-      reviewEn:
-        "I advise anyone who wants to develop their skills in digital marketing, whether a beginner or a professional in the fiel",
-      reviewAr:
-        "أنصح أي شخص يريد تطوير مهاراته في التسويق الرقمي، سواء كان مبتدئًا أو محترفًا في المجال",
-    },
-    {
-      id: 3,
-      name: isRTL ? "أحمد كيلاني" : "Ahmed Kilani",
-      gender: "male",
-      rating: 5,
-      reviewEn:
-        "Attention to the smallest details.. The staff's is classy and quick in response.. I highly recommend dealing with them",
-      reviewAr:
-        "اهتمام بأدق التفاصيل.. طاقم العمل راقي وسريع في الاستجابة.. أنصح بشدة بالتعامل معهم",
-    },
-    {
-      id: 4,
-      name: isRTL ? "دانا ترك" : "Dana Turk",
-      gender: "female",
-      rating: 5,
-      reviewEn:
-        "To the Management of Kafu I would like to express my sincere gratitude for the outstanding services you have provided. My...",
-      reviewAr:
-        "لإدارة وكالة Kafu أود أن أعبر عن امتناني الصادق للخدمات المتميزة التي قدمتموها. تجربتي...",
-    },
-    {
-      id: 5,
-      name: isRTL ? "مريم الأحمد" : "Maryam Al-Ahmad",
-      gender: "female",
-      rating: 5,
-      reviewEn:
-        "Exceptional service and professional team. The results exceeded my expectations and the support was outstanding...",
-      reviewAr:
-        "خدمة استثنائية وفريق محترف. النتائج فاقت توقعاتي والدعم كان متميزًا...",
-    },
-    {
-      id: 6,
-      name: isRTL ? "عمر السالم" : "Omar Al-Salem",
-      gender: "male",
-      rating: 5,
-      reviewEn:
-        "Working with this agency was a game-changer for our business. Highly professional and results-driven approach...",
-      reviewAr:
-        "العمل مع هذه الوكالة غيّر قواعد اللعبة لأعمالنا. نهج مهني للغاية ويركز على النتائج...",
-    },
-    {
-      id: 7,
-      name: isRTL ? "فاطمة الزهراء" : "Fatima Al-Zahra",
-      gender: "female",
-      rating: 5,
-      reviewEn:
-        "Outstanding creativity and attention to detail. The team delivered beyond our expectations with perfect timing...",
-      reviewAr:
-        "إبداع متميز واهتمام بالتفاصيل. الفريق حقق ما فاق توقعاتنا بتوقيت مثالي...",
-    },
-    {
-      id: 8,
-      name: isRTL ? "خالد المنصور" : "Khalid Al-Mansour",
-      gender: "male",
-      rating: 5,
-      reviewEn:
-        "Professional service from start to finish. Great communication and exceptional results. Highly recommended!",
-      reviewAr:
-        "خدمة مهنية من البداية للنهاية. تواصل رائع ونتائج استثنائية. أنصح بشدة!",
-    },
-    {
-      id: 9,
-      name: isRTL ? "سارة محمود" : "Sarah Mahmoud",
-      gender: "female",
-      rating: 5,
-      reviewEn:
-        "Amazing experience with the team. They understand the market very well and provided excellent strategies for our brand...",
-      reviewAr:
-        "تجربة رائعة مع الفريق. يفهمون السوق جيداً وقدموا استراتيجيات ممتازة لعلامتنا التجارية...",
-    },
-    {
-      id: 10,
-      name: isRTL ? "محمد الأسدي" : "Mohammed Al-Asadi",
-      gender: "male",
-      rating: 5,
-      reviewEn:
-        "The best agency I've worked with. Their creative approach and dedication to quality is unmatched...",
-      reviewAr:
-        "أفضل وكالة تعاملت معها. نهجهم الإبداعي وتفانيهم في الجودة لا يضاهى...",
-    },
-    {
-      id: 11,
-      name: isRTL ? "نور الهدى" : "Nour Al-Huda",
-      gender: "female",
-      rating: 5,
-      reviewEn:
-        "Incredible results in a short time. The team is professional, responsive, and truly understands digital marketing...",
-      reviewAr:
-        "نتائج لا تصدق في وقت قصير. الفريق محترف ومستجيب ويفهم حقاً التسويق الرقمي...",
-    },
-    {
-      id: 12,
-      name: isRTL ? "أسامة الحكيم" : "Osama Al-Hakeem",
-      gender: "male",
-      rating: 5,
-      reviewEn:
-        "Top-notch service and outstanding support. They helped us achieve our marketing goals beyond expectations...",
-      reviewAr:
-        "خدمة من الدرجة الأولى ودعم متميز. ساعدونا في تحقيق أهدافنا التسويقية بما يفوق التوقعات...",
-    },
-    {
-      id: 13,
-      name: isRTL ? "ليلى القاسمي" : "Layla Al-Qasimi",
-      gender: "female",
-      rating: 5,
-      reviewEn:
-        "Fantastic team with innovative solutions. They transformed our brand presence and increased our engagement significantly...",
-      reviewAr:
-        "فريق رائع بحلول مبتكرة. حولوا حضور علامتنا التجارية وزادوا من تفاعلنا بشكل كبير...",
-    },
-    {
-      id: 14,
-      name: isRTL ? "زياد العلي" : "Ziad Al-Ali",
-      gender: "male",
-      rating: 5,
-      reviewEn:
-        "Excellent collaboration and remarkable results. Their strategic approach helped us reach new markets successfully...",
-      reviewAr:
-        "تعاون ممتاز ونتائج رائعة. نهجهم الاستراتيجي ساعدنا في الوصول لأسواق جديدة بنجاح...",
-    },
-    {
-      id: 15,
-      name: isRTL ? "رانيا الشامي" : "Rania Al-Shami",
-      gender: "female",
-      rating: 5,
-      reviewEn:
-        "Professional expertise and creative vision. They delivered exactly what we needed to elevate our brand...",
-      reviewAr:
-        "خبرة مهنية ورؤية إبداعية. قدموا بالضبط ما احتجناه لرفع مستوى علامتنا التجارية...",
-    },
-    {
-      id: 16,
-      name: isRTL ? "طارق الفارس" : "Tarek Al-Fares",
-      gender: "male",
-      rating: 5,
-      reviewEn:
-        "Outstanding quality and timely delivery. Working with this agency was one of our best business decisions...",
-      reviewAr:
-        "جودة متميزة وتسليم في الوقت المحدد. العمل مع هذه الوكالة كان من أفضل قراراتنا التجارية...",
-    },
-  ];
+  {
+    id: 3,
+    name: isRTL ? "أحمد كيلاني" : "Ahmed Kilani",
+    gender: "male",
+    rating: 5,
+    reviewEn:
+      "Attention to the smallest details. The staff is classy and quick to respond. I highly recommend dealing with them.",
+    reviewAr:
+      "اهتمام بأدق التفاصيل. طاقم العمل راقي وسريع الاستجابة. أنصح بشدة بالتعامل معهم.",
+  },
+  {
+    id: 4,
+    name: isRTL ? "دانا ترك" : "Dana Turk",
+    gender: "female",
+    rating: 5,
+    reviewEn:
+      "To the Management of Kafu, I would like to express my sincere gratitude for the outstanding services you have provided. My experience was exceptional and highly satisfying.",
+    reviewAr:
+      "لإدارة وكالة Kafu، أود أن أعبر عن امتناني الصادق للخدمات المتميزة التي قدمتموها. كانت تجربتي استثنائية ومرضية للغاية.",
+  },
+  {
+    id: 5,
+    name: isRTL ? "مريم الأحمد" : "Maryam Al-Ahmad",
+    gender: "female",
+    rating: 5,
+    reviewEn:
+      "Exceptional service and a professional team. The results exceeded my expectations, and the support was outstanding throughout the process.",
+    reviewAr:
+      "خدمة استثنائية وفريق محترف. النتائج فاقت توقعاتي، وكان الدعم متميزاً طوال العملية.",
+  },
+  {
+    id: 6,
+    name: isRTL ? "عمر السالم" : "Omar Al-Salem",
+    gender: "male",
+    rating: 5,
+    reviewEn:
+      "Working with this agency was a game-changer for our business. They have a highly professional and results-driven approach.",
+    reviewAr:
+      "العمل مع هذه الوكالة غيّر قواعد اللعبة لأعمالنا. لديهم نهج مهني للغاية يركز على النتائج.",
+  },
+  {
+    id: 7,
+    name: isRTL ? "فاطمة الزهراء" : "Fatima Al-Zahra",
+    gender: "female",
+    rating: 5,
+    reviewEn:
+      "Outstanding creativity and attention to detail. The team delivered beyond our expectations with perfect timing.",
+    reviewAr:
+      "إبداع متميز واهتمام بالتفاصيل. الفريق حقق ما فاق توقعاتنا بتوقيت مثالي.",
+  },
+  {
+    id: 8,
+    name: isRTL ? "خالد المنصور" : "Khalid Al-Mansour",
+    gender: "male",
+    rating: 5,
+    reviewEn:
+      "Professional service from start to finish. Great communication and exceptional results. Highly recommended!",
+    reviewAr:
+      "خدمة مهنية من البداية للنهاية. تواصل رائع ونتائج استثنائية. أنصح بشدة!",
+  },
+  {
+    id: 9,
+    name: isRTL ? "سارة محمود" : "Sarah Mahmoud",
+    gender: "female",
+    rating: 5,
+    reviewEn:
+      "Amazing experience with the team. They understand the market very well and provided excellent strategies for our brand growth.",
+    reviewAr:
+      "تجربة رائعة مع الفريق. يفهمون السوق جيداً وقدموا استراتيجيات ممتازة لنمو علامتنا التجارية.",
+  },
+  {
+    id: 10,
+    name: isRTL ? "محمد الأسدي" : "Mohammed Al-Asadi",
+    gender: "male",
+    rating: 5,
+    reviewEn:
+      "The best agency I've worked with. Their creative approach and dedication to quality are unmatched.",
+    reviewAr:
+      "أفضل وكالة تعاملت معها. نهجهم الإبداعي وتفانيهم في الجودة لا يضاهى.",
+  },
+  {
+    id: 11,
+    name: isRTL ? "نور الهدى" : "Nour Al-Huda",
+    gender: "female",
+    rating: 5,
+    reviewEn:
+      "Incredible results in a short time. The team is professional, responsive, and truly understands digital marketing.",
+    reviewAr:
+      "نتائج لا تصدق في وقت قصير. الفريق محترف، سريع الاستجابة، ويفهم حقاً التسويق الرقمي.",
+  },
+  {
+    id: 12,
+    name: isRTL ? "أسامة الحكيم" : "Osama Al-Hakeem",
+    gender: "male",
+    rating: 5,
+    reviewEn:
+      "Top-notch service and outstanding support. They helped us achieve our marketing goals beyond expectations.",
+    reviewAr:
+      "خدمة من الدرجة الأولى ودعم متميز. ساعدونا في تحقيق أهدافنا التسويقية بما يفوق التوقعات.",
+  },
+  {
+    id: 13,
+    name: isRTL ? "ليلى القاسمي" : "Layla Al-Qasimi",
+    gender: "female",
+    rating: 5,
+    reviewEn:
+      "Fantastic team with innovative solutions. They transformed our brand presence and significantly increased our engagement.",
+    reviewAr:
+      "فريق رائع بحلول مبتكرة. حولوا حضور علامتنا التجارية وزادوا من تفاعلنا بشكل كبير.",
+  },
+  {
+    id: 14,
+    name: isRTL ? "زياد العلي" : "Ziad Al-Ali",
+    gender: "male",
+    rating: 5,
+    reviewEn:
+      "Excellent collaboration and remarkable results. Their strategic approach helped us reach new markets successfully.",
+    reviewAr:
+      "تعاون ممتاز ونتائج رائعة. نهجهم الاستراتيجي ساعدنا في الوصول لأسواق جديدة بنجاح.",
+  },
+  {
+    id: 15,
+    name: isRTL ? "رانيا الشامي" : "Rania Al-Shami",
+    gender: "female",
+    rating: 5,
+    reviewEn:
+      "Professional expertise and creative vision. They delivered exactly what we needed to elevate our brand.",
+    reviewAr:
+      "خبرة مهنية ورؤية إبداعية. قدموا بالضبط ما احتجناه لرفع مستوى علامتنا التجارية.",
+  },
+  {
+    id: 16,
+    name: isRTL ? "طارق الفارس" : "Tarek Al-Fares",
+    gender: "male",
+    rating: 5,
+    reviewEn:
+      "Outstanding quality and timely delivery. Working with this agency was one of our best business decisions.",
+    reviewAr:
+      "جودة متميزة وتسليم في الوقت المحدد. العمل مع هذه الوكالة كان من أفضل قراراتنا التجارية.",
+  },
+];
+
+
   const nextTestimonial = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex >= testimonials.length - 2 ? 0 : prevIndex + 2

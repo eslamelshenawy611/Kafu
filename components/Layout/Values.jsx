@@ -55,10 +55,13 @@ export default function ValuesSection() {
         <div
           className="container-fluid  sm:px-6 md:px-8 lg:px-12 relative z-10 "
           style={{
-            background: `  radial-gradient(circle at 30% 30%, #ff883e 0%, transparent 20%),
-  radial-gradient(circle at 70% 70%, #ff883e 0%, transparent 20%),
-conic-gradient(from 0deg at 50% 50%, #000000 0deg, #ff883e 40deg, #000000 80deg, #ff883e 100deg, #000000 140deg, #ff883e 200deg, #000000 260deg, #ff883e 320deg, #000000 360deg),
-  #000000`,
+       background: `
+  linear-gradient(135deg, rgba(232, 124, 57, 0.3) 0%, transparent 50%, rgba(196, 196, 196, 0.2) 100%),
+  linear-gradient(45deg, transparent 30%, rgba(232, 124, 57, 0.15) 50%, transparent 70%),
+  linear-gradient(-45deg, transparent 30%, rgba(196, 196, 196, 0.15) 50%, transparent 70%),
+  radial-gradient(circle at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.8) 100%),
+  #000000
+`,
             boxShadow: "inset 0 10px 15px -10px rgba(0, 0, 0, 0.5)",
           }}
         >

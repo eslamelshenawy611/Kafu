@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   FaWhatsapp, 
@@ -8,12 +9,23 @@ import {
   FaEnvelope, 
   FaPhone, 
   FaMapMarkerAlt,
-  FaArrowUp 
+  FaArrowUp ,
+  FaTiktok, 
+   FaLinkedinIn
 } from 'react-icons/fa';
 
 export default function Footer() {
-  const { t, isRTL } = useLanguage();
-  
+  const { t, isRTL } = useLanguage();  
+    const [isDesktop, setIsDesktop] = useState(false);
+useEffect(() => {
+    const checkDevice = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
   const currentYear = new Date().getFullYear();
 
   // Social links
@@ -32,10 +44,26 @@ export default function Footer() {
     },
     {
       icon: FaEnvelope,
-      href: 'mailto:marketingkafu@gmail.com', 
+      href: isDesktop 
+    ? 'https://mail.google.com/mail/?view=cm&fs=1&to=marketingkafu@gmail.com'
+    : 'mailto:marketingkafu@gmail.com', 
       color: "hover:text-[#ff883e]",
       label: "Email"
-    }
+    },
+     {
+        icon: FaTiktok,
+        href: 'https://www.tiktok.com/@kafu.marketing?_t=ZS-901OYIsjVxM&_r=1', 
+        label: 'TikTok',
+        bgColor: 'bg-black/60',
+        textColor: 'text-white hover:text-gray-300'
+      },
+      {
+        icon: FaLinkedinIn,
+        href: 'https://www.linkedin.com/company/109021030/admin/page-posts/published/', // ضع رابط اللينكد إن هنا
+        label: 'LinkedIn',
+        bgColor: 'bg-black/60',
+        textColor: 'text-blue-500 hover:text-blue-600'
+      }
   ];
 
   // Contact info
@@ -49,7 +77,9 @@ export default function Footer() {
     {
       icon: FaEnvelope,
       text: "marketingkafu@gmail.com",
-      href: "mailto:marketingkafu@gmail.com",
+      href: isDesktop 
+    ? 'https://mail.google.com/mail/?view=cm&fs=1&to=marketingkafu@gmail.com'
+    : 'mailto:marketingkafu@gmail.com',
       label: t('email')
     },
     {

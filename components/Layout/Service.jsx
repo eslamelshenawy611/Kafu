@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion, useInView } from "framer-motion";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
-
+import { useRouter } from "next/navigation";
 // Component for the animated starfield background
 const StarfieldBackground = () => (
   <div className="absolute inset-0 opacity-50 pointer-events-none z-0">
@@ -37,21 +37,26 @@ const servicesData = [
     key: "socialMedia",
     image: "/service-image/e6f464b6-71c5-4eda-9816-2428319b08bf.jpg",
     gradient: "from-blue-500 via-purple-600 to-pink-500",
+     href:"Digital-marketing"
   },
   {
     key: "creativeDesign",
     image: "/service-image/276f27cf-d295-4ec1-97fb-719b76576184.jpg",
     gradient: "from-pink-500 via-red-500 to-orange-500",
+     href:"Event"
+
   },
   {
     key: "mediaProduction",
     image: "/service-image/fb7003d5-cb62-4701-85e9-791124d930da.jpg",
     gradient: "from-purple-600 via-indigo-600 to-blue-600",
+    href:"media"
   },
   {
     key: "paidAdvertising",
     image: "/service-image/72db65bc-bf7f-496b-94be-b4dd72a70b68.jpg",
     gradient: "from-green-500 via-teal-500 to-blue-500",
+    href:"influencer"
   },
 ];
 
@@ -93,56 +98,58 @@ export default function ServicesSection() {
     };
   }, []);
 
-  const ServiceCard = ({ service, index }) => (
-    <motion.div
-      key={service.key}
-      initial={{ opacity: 0, y: 50 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{
-        duration: 0.6,
-        delay: 0.5 + index * 0.1,
-        type: "spring",
-      }}
-      className="flex flex-col items-center gap-4"
-    >
-      {/* Planet */}
+  const ServiceCard = ({ service, index }) => {
+    const router = useRouter(); // أضف هذا السطر
+
+    return (
       <motion.div
-        whileHover={{ scale: 1.1, rotate: 5 }}
-        whileTap={{ scale: 0.95 }}
-        className="relative group cursor-pointer"
+        key={service.key}
+        initial={{ opacity: 0, y: 50 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{
+          duration: 0.6,
+          delay: 0.5 + index * 0.1,
+          type: "spring",
+        }}
+        className="flex flex-col items-center gap-4"
       >
+        {/* Planet */}
         <motion.div
-          animate={{
-            x: [0, 7, 0, -7, 0],
-            y: [-7, 0, 7, 0, -7],
-          }}
-          transition={{
-            duration: 5 + index * 0.5,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          // --- التعديل رقم 2: استخدام الحجم الديناميكي ---
-          className={`${service.size} rounded-full shadow-2xl relative overflow-hidden transition-all duration-300`}
-          style={{
-            boxShadow:
-              "0 20px 50px rgba(255,149,0,0.2), 0 10px 30px rgba(255,149,0,0.1)",
-          }}
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          whileTap={{ scale: 0.95 }}
+          className="relative group cursor-pointer"
         >
-          {!imageErrors[service.key] ? (
-            <img
-              src={service.image}
-              alt={t(`services.${service.key}.title`)}
-              className="w-full h-full object-cover rounded-full"
-              onError={() =>
-                setImageErrors((prev) => ({ ...prev, [service.key]: true }))
-              }
-            />
-          ) : (
-            <div
-              className={`w-full h-full bg-gradient-to-br ${service.gradient} rounded-full flex items-center justify-center text-2xl`}
-            />
-          )}
-          {/* Glowing Halo */}
+          <motion.div
+            animate={{
+              x: [0, 7, 0, -7, 0],
+              y: [-7, 0, 7, 0, -7],
+            }}
+            transition={{
+              duration: 5 + index * 0.5,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            className={`${service.size} rounded-full shadow-2xl relative overflow-hidden transition-all duration-300`}
+            style={{
+              boxShadow:
+                "0 20px 50px rgba(255,149,0,0.2), 0 10px 30px rgba(255,149,0,0.1)",
+            }}
+          >
+            {!imageErrors[service.key] ? (
+              <img
+                src={service.image}
+                alt={t(`services.${service.key}.title`)}
+                className="w-full h-full object-cover rounded-full"
+                onError={() =>
+                  setImageErrors((prev) => ({ ...prev, [service.key]: true }))
+                }
+              />
+            ) : (
+              <div
+                className={`w-full h-full bg-gradient-to-br ${service.gradient} rounded-full flex items-center justify-center text-2xl`}
+              />
+            )}
+                {/* Glowing Halo */}
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
             <div
               className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-30 rounded-full blur-xl`}
@@ -167,63 +174,66 @@ export default function ServicesSection() {
       </motion.div>
 
       {/* Service Card */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={isInView ? { opacity: 1, scale: 1 } : {}}
-        transition={{ delay: 0.8 + index * 0.1 }}
-        className={`
-          bg-white/5 backdrop-blur-md rounded-xl border border-white/10
-          ${isMobile ? "p-3" : isTablet ? "p-4" : "p-5"}
-          w-full max-w-[280px]
-          hover:bg-white/10 transition-all duration-300
-          shadow-xl hover:shadow-2xl hover:border-white/20
-          flex flex-col h-full min-h-[300px]
-          relative overflow-hidden
-        `}
-        style={{
-          boxShadow:
-            "0 10px 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,149,0,0.05)",
-        }}
-      >
-        <h3
-          className={`font-bold text-white text-center mb-2 relative z-10 ${
-            isMobile ? "text-sm" : isTablet ? "text-base" : "text-lg"
-          } ${isRTL ? "font-cairo" : "font-roboto"}`}
-        >
-          {t(`services.${service.key}.title`)}
-        </h3>
-        <p
-          className={`text-white text-center leading-relaxed flex-grow relative z-10
-            ${isMobile ? "text-xs" : "text-sm"}
-            ${isRTL ? "font-cairo" : "font-inter"}
-            whitespace-pre-line`}
-        >
-          {t(`services.${service.key}.description`)}
-        </p>
-        <motion.a
-          href="https://wa.me/971504616041"
-          target="_blank"
-          rel="noopener noreferrer"
+      
+      
+      {/* Service Card */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={isInView ? { opacity: 1, scale: 1 } : {}}
+          transition={{ delay: 0.8 + index * 0.1 }}
           className={`
-            mt-4 inline-flex items-center justify-center gap-2
-            text-white bg-[#FF883E] hover:bg-[#FF7A28]
-            rounded-full w-full transition-all duration-300
-            relative z-10
-            ${isMobile ? "px-3 py-2 text-xs" : "px-4 py-2 text-sm"}
+            bg-white/5 backdrop-blur-md rounded-xl border border-white/10
+            ${isMobile ? "p-3" : isTablet ? "p-4" : "p-5"}
+            w-full max-w-[280px]
+            hover:bg-white/10 transition-all duration-300
+            shadow-xl hover:shadow-2xl hover:border-white/20
+            flex flex-col h-full min-h-[300px]
+            relative overflow-hidden
           `}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          style={{
+            boxShadow:
+              "0 10px 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,149,0,0.05)",
+          }}
         >
-          {isRTL ? "اكتشف المزيد" : "Learn More"}
-          {isRTL ? (
-            <FaArrowLeft className={isMobile ? "text-xs" : "text-sm"} />
-          ) : (
-            <FaArrowRight className={isMobile ? "text-xs" : "text-sm"} />
-          )}
-        </motion.a>
+          <h3
+            className={`font-bold text-white text-center mb-2 relative z-10 ${
+              isMobile ? "text-sm" : isTablet ? "text-base" : "text-lg"
+            } ${isRTL ? "font-cairo" : "font-roboto"}`}
+          >
+            {t(`services.${service.key}.title`)}
+          </h3>
+          <p
+            className={`text-white text-center leading-relaxed flex-grow relative z-10
+              ${isMobile ? "text-xs" : "text-sm"}
+              ${isRTL ? "font-cairo" : "font-inter"}
+              whitespace-pre-line`}
+          >
+            {t(`services.${service.key}.description`)}
+          </p>
+          {/* --- التعديل الرئيسي هنا: استخدام motion.button مع onClick --- */}
+          <motion.button
+            onClick={() => router.push(service.href)}
+            className={`
+              mt-4 inline-flex items-center justify-center gap-2
+              text-white bg-[#FF883E] hover:bg-[#FF7A28]
+              rounded-full w-full transition-all duration-300
+              relative z-10
+              ${isMobile ? "px-3 py-2 text-xs" : "px-4 py-2 text-sm"}
+            `}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {isRTL ? "اكتشف المزيد" : "Learn More"}
+            {isRTL ? (
+              <FaArrowLeft className={isMobile ? "text-xs" : "text-sm"} />
+            ) : (
+              <FaArrowRight className={isMobile ? "text-xs" : "text-sm"} />
+            )}
+          </motion.button>
+        </motion.div>
       </motion.div>
-    </motion.div>
-  );
+    );
+  };
 
   return (
     <>
@@ -365,4 +375,5 @@ export default function ServicesSection() {
       </section>
     </>
   );
+
 }
