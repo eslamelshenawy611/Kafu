@@ -102,7 +102,6 @@ const sliderImages = [
   "/influencer/team.png",
   
 ];
-// Enhanced Starfield Background with patterns
 const EnhancedBackground = () => (
   <>
     {/* Grid Pattern */}
@@ -110,14 +109,15 @@ const EnhancedBackground = () => (
       className="absolute inset-0 opacity-5"
       style={{
         backgroundImage: `
-          linear-gradient(#ff883e 1px, transparent 1px),
-          linear-gradient(90deg, #ff883e 1px, transparent 1px)
-        `,
+                  linear-gradient(#ff883e 1px, transparent 1px),
+                  linear-gradient(90deg, #ff883e 1px, transparent 1px)
+                `,
         backgroundSize: "50px 50px",
       }}
     />
   </>
 );
+
 // Image Modal Component
 const ImageModal = ({ isOpen, onClose, imageSrc }) => {
   const [scale, setScale] = useState(1);
@@ -161,7 +161,7 @@ const ImageModal = ({ isOpen, onClose, imageSrc }) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center"
-        onClick={onClose} // تعديل: إغلاق المودال عند الضغط في أي مكان
+        onClick={onClose}
       >
         <div className="relative w-full h-full flex items-center justify-center p-4">
           {/* Zoom Controls */}
@@ -186,6 +186,14 @@ const ImageModal = ({ isOpen, onClose, imageSrc }) => {
             </button>
           </div>
 
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-white bg-white/20 hover:bg-white/30 backdrop-blur-md p-3 rounded-full transition-all duration-300 z-10"
+          >
+            <FaTimes className="text-xl" />
+          </button>
+
           {/* Image */}
           <motion.img
             src={imageSrc}
@@ -204,30 +212,18 @@ const ImageModal = ({ isOpen, onClose, imageSrc }) => {
     </AnimatePresence>
   );
 };
+
+
 export default function DigitalMarketingService() {
   const { language, isRTL } = useLanguage();
-
-  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalImageSrc, setModalImageSrc] = useState(""); // تعديل: لتخزين مصدر الصورة المختارة
+  const [modalImageSrc, setModalImageSrc] = useState("");
   const content = serviceDetailsData[language];
   const heroRef = useRef(null);
   const servicesRef = useRef(null);
   const heroInView = useInView(heroRef, { once: true });
   const servicesInView = useInView(servicesRef, { once: true });
 
-  // Window size effect
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // تعديل: دالة فتح المودال مع الصورة المحددة
   const openModal = (imageSrc) => {
     setModalImageSrc(imageSrc);
     setIsModalOpen(true);
@@ -237,23 +233,19 @@ export default function DigitalMarketingService() {
     setIsModalOpen(false);
   };
 
-  // Get radius based on screen size
-  const getRadius = () => {
-    if (windowSize.width < 640) return 180;
-    if (windowSize.width < 1024) return 230;
-    return 280;
+  // تحديد مواضع الأيقونات بشكل منظم
+  const getServicePosition = (index) => {
+    const positions = [
+      { angle: 0, radius: 35, textAlign: "bottom" },    // يمين - النص على اليسار
+      { angle: 72, radius: 35, textAlign: "bottom" }, // أعلى يمين - النص أسفل
+      { angle: 144, radius: 45, textAlign: "bottom" }, // أعلى يسار - النص أسفل
+      { angle: 216, radius: 50, textAlign: "top" },   // أسفل يسار - النص أعلى
+      { angle: 288, radius: 45, textAlign: "top" },   // أسفل يمين - النص أعلى
+    ];
+    
+    return positions[index] || positions[0];
   };
 
-  // Positions for orbiting services - evenly distributed
-  const servicePositions = [
-       { angle: -105, radius: getRadius() + 130 }, // top
-    { angle: -70, radius: getRadius() + 60 }, // top right
-    { angle: 20, radius: getRadius() - 120 }, // bottom right
-    { angle: 180, radius: getRadius() - 60 }, // bottom left
-    { angle: 100, radius: getRadius() - 80 }, // top left
-  ];
-
-  // Handle image errors
   const handleImageError = (e, fallbackSrc = "") => {
     if (e.target.src !== fallbackSrc) {
       e.target.src = fallbackSrc;
@@ -261,7 +253,6 @@ export default function DigitalMarketingService() {
   };
 
   return (
-    // تعديل: نقل الخلفية لتكون في العنصر الرئيسي للصفحة
     <div
       className="min-h-screen bg-black overflow-hidden relative"
       style={{
@@ -270,14 +261,10 @@ export default function DigitalMarketingService() {
       }}
     >
       <EnhancedBackground />
-
       <Header />
 
       {/* Hero Section with Planet and Orbiting Services */}
-      <section
-        ref={heroRef}
-        className="relative min-h-[90vh] overflow-hidden pt-32 "
-      >
+      <section ref={heroRef} className="relative overflow-hidden pt-32">
         <div className="container mx-auto px-4 relative z-10">
           {/* Title */}
           <motion.div
@@ -287,14 +274,14 @@ export default function DigitalMarketingService() {
             className="text-center mb-12"
           >
             <h1
-              className={`text-4xl md:text-4xl font-bold text-[#FF8B3F] mb-6 mt-10   ${
+              className={`text-4xl md:text-6xl font-bold text-[#FF8B3F] mb-6 mt-10 ${
                 isRTL ? "font-cairo" : "font-sora"
               }`}
             >
               {content.title}
             </h1>
             <p
-              className={`text-lg md:text-[19px] text-[#c4c4c4] max-w-2xl mx-auto  ${
+              className={`text-lg md:text-xl text-[#c4c4c4] max-w-2xl mx-auto ${
                 isRTL ? "font-cairo" : "font-inter"
               }`}
             >
@@ -303,16 +290,16 @@ export default function DigitalMarketingService() {
           </motion.div>
 
           {/* Planet with Orbiting Services */}
-          <div className="relative w-full h-[600px] md:h-[700px] flex items-center justify-center py-10 mt-52">
-            {/* Orbit Rings - Behind everything */}
+          <div className="relative w-full max-w-[800px] mx-auto aspect-square flex items-center justify-center mt-20 md:mt-32">
+            {/* Orbit Rings */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
               <motion.div
-                className="absolute w-[550px] h-[550px] md:w-[650px] md:h-[650px] rounded-full border border-[#ff883e]/20"
+                className="absolute w-[90%] h-[90%] rounded-full border border-[#ff883e]/20"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
               />
               <motion.div
-                className="absolute w-[500px] h-[500px] md:w-[600px] md:h-[600px] rounded-full border border-[#ff883e]/10"
+                className="absolute w-[80%] h-[80%] rounded-full border border-[#ff883e]/10"
                 animate={{ rotate: -360 }}
                 transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
               />
@@ -323,12 +310,12 @@ export default function DigitalMarketingService() {
               initial={{ scale: 0, rotate: -180 }}
               animate={heroInView ? { scale: 1, rotate: 0 } : {}}
               transition={{ duration: 1.5, type: "spring" }}
-              className="relative z-10"
+              className="relative z-10 w-[30%] h-[30%] md:w-[35%] md:h-[35%] lg:w-[40%] lg:h-[40%]"
             >
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-                className="w-72 h-72 md:w-80 md:h-80 relative"
+                className="w-full h-full relative"
               >
                 <img
                   src="/service-image/72db65bc-bf7f-496b-94be-b4dd72a70b68.jpg"
@@ -338,627 +325,583 @@ export default function DigitalMarketingService() {
                     e.target.style.display = "none";
                   }}
                 />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#ff883e]/40 to-transparent" />
-                <div className="absolute inset-0 rounded-full" />
-              </motion.div>
-            </motion.div>
-
-            {/* Orbiting Service Icons Container */}
-            <div className="absolute inset-0">
-              {content.services.map((service, index) => {
-                const { angle, radius } = servicePositions[index];
-                const radians = (angle * Math.PI) / 180;
-
-                // Calculate position from center of container
-                const centerX = 50; // Container center in percentage
-                const centerY = 50;
-
-                // Convert radius to percentage of container width/height
-                const radiusPercentX = (radius / 350) * 50; // 350 is approximate half container width
-                const radiusPercentY = (radius / 350) * 50;
-
-                // Calculate final position in percentage
-                const x = centerX + Math.cos(radians) * radiusPercentX;
-                const y = centerY + Math.sin(radians) * radiusPercentY;
-
-                return (
-                  <motion.div
-                    key={index}
-                    className="absolute"
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={
-                      heroInView
-                        ? {
-                            opacity: 1,
-                            scale: 1,
-                          }
-                        : {}
-                    }
-                    transition={{
-                      opacity: { duration: 0.5, delay: 0.5 + index * 0.1 },
-                      scale: { duration: 0.5, delay: 0.5 + index * 0.1 },
-                    }}
-                    style={{
-                      left: `${x}%`,
-                      top: `${y}%`,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  >
-                    <div className="flex flex-col items-center gap-3 group cursor-pointer">
-                      <div className="relative">
-                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center shadow-xl overflow-hidden bg-transparent backdrop-blur-md  border-[#ff883e]/20 transition-all duration-300 group-hover:border-[#ff883e]/40">
-                          <img
-                            src={service.icon}
-                            alt={service.title}
-                            className="w-12 h-12 md:w-16 md:h-16 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110"
-                            onError={(e) =>
-                              handleImageError(e, "/default-service-icon.jpg")
+               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#ff883e]/40 to-transparent" />
+                                          </motion.div>
+                                        </motion.div>
+                            
+                                        {/* Orbiting Service Icons Container */}
+                                        <div className="absolute inset-0 w-full h-full">
+                                          {content.services.map((service, index) => {
+                                            const position = getServicePosition(index);
+                                            const radians = (position.angle * Math.PI) / 180;
+                                            const radius = position.radius;
+                                            const centerX = 50;
+                                            const centerY = 50;
+                                            const x = centerX + Math.cos(radians) * radius;
+                                            const y = centerY + Math.sin(radians) * radius;
+                            
+                                            // حساب موضع النص بناءً على موضع الأيقونة
+                                            const getTextPosition = () => {
+                                              switch (position.textAlign) {
+                                                case "left":
+                                                  return {
+                                                    left: "auto",
+                                                    right: "110%",
+                                                    top: "50%",
+                                                    transform: "translateY(-50%)",
+                                                    textAlign: "right",
+                                                  };
+                                                case "right":
+                                                  return {
+                                                    left: "110%",
+                                                    right: "auto",
+                                                    top: "50%",
+                                                    transform: "translateY(-50%)",
+                                                    textAlign: "left",
+                                                  };
+                                                case "top":
+                                                  return {
+                                                    left: "50%",
+                                                    bottom: "110%",
+                                                    top: "auto",
+                                                    transform: "translateX(-50%)",
+                                                    textAlign: "center",
+                                                  };
+                                                case "bottom":
+                                                  return {
+                                                    left: "50%",
+                                                    top: "110%",
+                                                    bottom: "auto",
+                                                    transform: "translateX(-50%)",
+                                                    textAlign: "center",
+                                                  };
+                                                default:
+                                                  return {
+                                                    left: "50%",
+                                                    top: "110%",
+                                                    transform: "translateX(-50%)",
+                                                    textAlign: "center",
+                                                  };
+                                              }
+                                            };
+                            
+                                            const textStyle = getTextPosition();
+                            
+                                            return (
+                                              <motion.div
+                                                key={index}
+                                                className="absolute pointer-events-auto"
+                                                initial={{ opacity: 0, scale: 0 }}
+                                                animate={heroInView ? { opacity: 1, scale: 1 } : {}}
+                                                transition={{
+                                                  opacity: { duration: 0.5, delay: 0.5 + index * 0.15 },
+                                                  scale: { duration: 0.5, delay: 0.5 + index * 0.15 },
+                                                }}
+                                                style={{
+                                                  left: `${x}%`,
+                                                  top: `${y}%`,
+                                                  transform: "translate(-50%, -50%)",
+                                                }}
+                                              >
+                                                <div className="relative flex flex-col items-center gap-3 group cursor-pointer">
+                                                  {/* Icon Container */}
+                                                  <div className="relative">
+                                                    <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-2xl flex items-center justify-center shadow-xl overflow-hidden bg-black/60 backdrop-blur-md  transition-all duration-300 group-hover:border-[#ff883e] group-hover:bg-black/80 group-hover:scale-110">
+                                                      <img
+                                                        src={service.icon}
+                                                        alt={service.title}
+                                                        className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 object-contain relative z-10"
+                                                        onError={(e) =>
+                                                          handleImageError(e, "/default-service-icon.jpg")
+                                                        }
+                                                        loading="lazy"
+                                                      />
+                                                    </div>
+                                                    
+                                                    {/* Text positioned based on icon location */}
+                                                    <div 
+                                                      className="absolute whitespace-nowrap z-20"
+                                                      style={{
+                                                        ...textStyle,
+                                                        minWidth: "150px",
+                                                        maxWidth: "200px",
+                                                      }}
+                                                    >
+                                                      <span
+                                                        className={`text-xs sm:text-sm md:text-base text-[#ff883e] font-semibold drop-shadow-lg bg-black/70 px-2 py-1 rounded-lg inline-block ${
+                                                          isRTL ? "font-cairo" : "font-roboto"
+                                                        }`}
+                                                        style={{ textAlign: textStyle.textAlign }}
+                                                      >
+                                                        {service.title}
+                                                      </span>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </motion.div>
+                                            );
+                                          })}
+                                        </div>
+                                      </div>
+                            
+                                      {/* Ready to Get Started CTA */}
+                                      <motion.div
+                                        initial={{ opacity: 0, y: 50 }}
+                                        animate={heroInView ? { opacity: 1, y: 0 } : {}}
+                                        transition={{ duration: 0.8, delay: 0.8 }}
+                                        className="text-center my-8"
+                                      >
+                                        <motion.a
+                                          href="https://wa.me/971504616041"
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-3 bg-[#ff883e] hover:bg-[#ff883e] text-white px-8 py-4 mt-22 rounded-full text-lg font-semibold shadow-2xl transition-all duration-300"
+                                          whileHover={{ scale: 1.05, y: -2 }}
+                                          whileTap={{ scale: 0.95 }}
+                                        >
+                                          {content.ctaButton}
+                                          {isRTL ? <FaArrowLeft /> : <FaArrowRight />}
+                                        </motion.a>
+                                      </motion.div>
+                                    </div>
+                                  </section>
+                            
+                                  {/* Image Grid Section */}
+                                  <section className="py-16 relative overflow-hidden">
+                                    <motion.div
+                                      initial={{ opacity: 0, y: 50 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      transition={{ duration: 0.8 }}
+                                      className="relative max-w-6xl mx-auto px-4 md:px-8 z-10"
+                                    >
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {sliderImages.map((image, index) => (
+                                          <motion.div
+                                            key={index}
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                                            className="relative group cursor-pointer overflow-hidden rounded-2xl shadow-xl"
+                                            onClick={() => openModal(image)}
+                                          >
+                                            <img
+                                              src={image}
+                                              alt={`Service ${index + 1}`}
+                                              className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+                                              onError={(e) => {
+                                                e.target.src = "";
+                                              }}
+                                            />
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
+                                              <FaSearchPlus className="text-white text-4xl drop-shadow-lg" />
+                                            </div>
+                                          </motion.div>
+                                        ))}
+                                      </div>
+                                    </motion.div>
+                                  </section>
+                            
+                                  <ImageModal
+                                    isOpen={isModalOpen}
+                                    onClose={closeModal}
+                                    imageSrc={modalImageSrc}
+                                  />
+                            
+                                  {/* Services Details Section */}
+                                  <section ref={servicesRef} className="py-20 relative z-10">
+                                    <div className="container mx-auto px-4">
+                                      <motion.h2
+                                        initial={{ opacity: 0, y: -30 }}
+                                        animate={servicesInView ? { opacity: 1, y: 0 } : {}}
+                                        className={`text-3xl md:text-4xl font-bold text-center mb-12 text-white ${
+                                          isRTL ? "font-cairo" : "font-sora"
+                                        }`}
+                                      >
+                                        {isRTL ? "ماذا نفعل ؟" : "What we do ?"}
+                                      </motion.h2>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8  ">
+                                        {content.services.slice(0, 3).map((service, index) => (
+                                          <motion.div
+                                            key={index}
+                                            initial={{ opacity: 0, y: 50 }}
+                                            animate={servicesInView ? { opacity: 1, y: 0 } : {}}
+                                            transition={{ duration: 0.6, delay: index * 0.1 }}
+                                            className="bg-[#1a1a1a]/80 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-[#ff883e]/20 group"
+                                          >
+                                            <div className="h-full">
+                                              <div className="flex items-center gap-4 mb-4">
+                                                <div className="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300">
+                                                  <img
+                                                    src={service.icon}
+                                                    alt={service.title}
+                                                    className="w-8 h-8 object-contain"
+                                                    onError={(e) => handleImageError(e)}
+                                                  />
+                                                </div>
+                                                <h3
+                                                  className={`text-xl font-bold text-white flex-1 ${
+                                                    isRTL ? "font-cairo" : "font-roboto"
+                                                  }`}
+                                                >
+                                                  {service.title}
+                                                </h3>
+                                              </div>
+                                              <p
+                                                className={`text-white/70 leading-relaxed ${
+                                                  isRTL ? "font-cairo" : "font-inter"
+                                                }`}
+                                              >
+                                                {service.description}
+                                              </p>
+                                            </div>
+                                          </motion.div>
+                                        ))}
+                                      </div>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:grid-cols-2  max-w-5xl mx-auto">
+                                        {content.services.slice(3, 5).map((service, index) => (
+                                          <motion.div
+                                            key={index + 3}
+                                            initial={{ opacity: 0, y: 50 }}
+                                            animate={servicesInView ? { opacity: 1, y: 0 } : {}}
+                                            transition={{ duration: 0.6, delay: (index + 3) * 0.1 }}
+                                            className="bg-[#1a1a1a]/80 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-[#ff883e]/20 group"
+                                          >
+                                            <div className="h-full">
+                                              <div className="flex items-center gap-4 mb-4">
+                                                <div className="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300">
+                                                  <img
+                                                    src={service.icon}
+                                                    alt={service.title}
+                                                    className="w-8 h-8 object-contain"
+                                                    onError={(e) => handleImageError(e)}
+                                                  />
+                                                </div>
+                                                <h3
+                                                  className={`text-xl font-bold text-white flex-1 ${
+                                                    isRTL ? "font-cairo" : "font-roboto"
+                                                  }`}
+                                                >
+                                                  {service.title}
+                                                </h3>
+                                              </div>
+                                              <p
+                                                className={`text-white/70 leading-relaxed ${
+                                                  isRTL ? "font-cairo" : "font-inter"
+                                                }`}
+                                              >
+                                                {service.description}
+                                              </p>
+                                            </div>
+                                          </motion.div>
+                                        ))}
+                                      </div>
+                                      <motion.div
+                                        initial={{ opacity: 0, y: 50 }}
+                                        animate={servicesInView ? { opacity: 1, y: 0 } : {}}
+                                        transition={{ duration: 0.8, delay: 0.5 }}
+                                        className="mt-16 text-center"
+                                      >
+                                        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] p-12 rounded-3xl shadow-2xl border border-[#ff883e]/20">
+                                          <h3
+                                            className={`text-2xl md:text-3xl font-bold text-white mb-4 ${
+                                              isRTL ? "font-cairo" : "font-sora"
+                                            }`}
+                                          >
+                                            {isRTL
+                                              ? "دعنا نحول رؤيتك إلى واقع"
+                                              : "Let's Transform Your Vision into Reality"}
+                                          </h3>
+                                          <p
+                                            className={`text-white/90 mb-8 max-w-2xl mx-auto ${
+                                              isRTL ? "font-cairo" : "font-inter"
+                                            }`}
+                                          >
+                                            {isRTL
+                                              ? "فريقنا من الخبراء جاهز لمساعدتك في تحقيق أهدافك التسويقية الرقمية"
+                                              : "Our team of experts is ready to help you achieve your digital marketing goals"}
+                                          </p>
+                                          <motion.a
+                                            href="https://wa.me/971504616041"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-3 bg-[#ff883e] hover:bg-[#ff6a2e] text-white px-8 py-4 rounded-full text-lg font-semibold shadow-xl transition-all duration-300"
+                                            whileHover={{ scale: 1.05, y: -2 }}
+                                            whileTap={{ scale: 0.95 }}
+                                          >
+                                            {isRTL ? "تواصل معنا الآن" : "Contact Us Now"}
+                                            {isRTL ? <FaArrowLeft /> : <FaArrowRight />}
+                                          </motion.a>
+                                        </div>
+                                      </motion.div>
+                                    </div>
+                                  </section>
+                            
+                                  {/* Decorative Elements */}
+                                  <div className="fixed bottom-0 left-0 right-0 h-32 pointer-events-none z-0">
+                                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#ff883e] rounded-full blur-[150px] opacity-10" />
+                                  </div>
+                            
+                                  <Footer />
+                            
+                                  {/* Add custom styles for glassmorphism effect and other animations */}
+                                  <style jsx>{`
+                                    @supports (backdrop-filter: blur(10px)) or
+                                      (-webkit-backdrop-filter: blur(10px)) {
+                                      .glass-morphism {
+                                        background: rgba(26, 26, 26, 0.4);
+                                        backdrop-filter: blur(10px);
+                                        -webkit-backdrop-filter: blur(10px);
+                                        border: 1px solid rgba(255, 136, 62, 0.2);
+                                      }
+                                    }
+                            
+                                    @supports not (backdrop-filter: blur(10px)) {
+                                      .glass-morphism {
+                                        background: rgba(26, 26, 26, 0.8);
+                                        border: 1px solid rgba(255, 136, 62, 0.3);
+                                      }
+                                    }
+                            
+                                    /* Animation for floating effect */
+                                    @keyframes float {
+                                      0%,
+                                      100% {
+                                        transform: translateY(0px);
+                                      }
+                                      50% {
+                                        transform: translateY(-10px);
+                                      }
+                                    }
+                            
+                                    .floating {
+                                      animation: float 3s ease-in-out infinite;
+                                    }
+                            
+                                    /* Gradient text effect */
+                                    .gradient-text {
+                                      background: linear-gradient(45deg, #ff883e, #ff7a28);
+                                      -webkit-background-clip: text;
+                                      -webkit-text-fill-color: transparent;
+                                      background-clip: text;
+                                      text-fill-color: transparent;
+                                    }
+                            
+                                    /* Smooth scroll behavior */
+                                    html {
+                                      scroll-behavior: smooth;
+                                    }
+                            
+                                    /* Custom scrollbar */
+                                    ::-webkit-scrollbar {
+                                      width: 10px;
+                                    }
+                            
+                                    ::-webkit-scrollbar-track {
+                                      background: #1a1a1a;
+                                    }
+                            
+                                    ::-webkit-scrollbar-thumb {
+                                      background: #ff883e;
+                                      border-radius: 5px;
+                                    }
+                            
+                                    ::-webkit-scrollbar-thumb:hover {
+                                      background: #ff7a28;
+                                    }
+                            
+                                    /* Icon positioning adjustments for mobile */
+                                    @media (max-width: 768px) {
+                                      .service-orbit {
+                                        transform: scale(0.8);
+                                      }
+                                      
+                                      /* تعديل موضع النص على الموبايل */
+                                      .service-text {
+                                        position: absolute;
+                                        white-space: normal;
+                                        width: 120px;
+                                        text-align: center;
+                                      }
+                                    }
+                            
+                                    @media (max-width: 640px) {
+                                      .service-orbit {
+                                        transform: scale(0.65);
+                                      }
+                                    }
+                            
+                                    /* Modal animations */
+                                    .modal-content {
+                                      animation: modalSlideIn 0.3s ease-out;
+                                    }
+                            
+                                    @keyframes modalSlideIn {
+                                      from {
+                                        transform: scale(0.9);
+                                        opacity: 0;
+                                      }
+                                      to {
+                                        transform: scale(1);
+                                        opacity: 1;
+                                      }
+                                    }
+                            
+                                    /* Image hover effects */
+                                    .image-hover {
+                                      transition: all 0.3s ease;
+                                    }
+                            
+                                    .image-hover:hover {
+                                      transform: scale(1.05);
+                                    }
+                            
+                                    /* Prevent text overlap */
+                                    .service-item {
+                                      isolation: isolate;
+                                    }
+                            
+                                    .service-text-wrapper {
+                                      position: absolute;
+                                      z-index: 30;
+                                      pointer-events: none;
+                                    }
+                            
+                                    /* Orbit path visualization (optional - for debugging) */
+                                    .orbit-path {
+                                      position: absolute;
+                                      inset: 0;
+                                      border: 1px dashed rgba(255, 136, 62, 0.1);
+                                      border-radius: 50%;
+                                      pointer-events: none;
+                                    }
+                            
+                                    /* Enhanced icon hover states */
+                                    .service-icon-container {
+                                      position: relative;
+                                      z-index: 20;
+                                    }
+                            
+                                    .service-icon-container::before {
+                                      content: '';
+                                      position: absolute;
+                                      inset: -4px;
+                                      background: linear-gradient(45deg, #ff883e, #ff7a28);
+                                      border-radius: 20px;
+                                      opacity: 0;
+                                      transition: opacity 0.3s ease;
+                                      z-index: -1;
+                                    }
+                            
+                                    .service-icon-container:hover::before {
+                                      opacity: 0.3;
+                                    }
+                            
+                                    /* Responsive text positioning */
+                                    @media (max-width: 1024px) {
+                                      .orbit-text-left {
+                                        right: calc(100% + 10px) !important;
+                                      }
+                                      
+                                      .orbit-text-right {
+                                        left: calc(100% + 10px) !important;
+                                      }
+                                      
+                                      .orbit-text-top {
+                                        bottom: calc(100% + 10px) !important;
+                                      }
+                                      
+                                      .orbit-text-bottom {
+                                        top: calc(100% + 10px) !important;
+                                      }
+                                    }
+                            
+                                    /* Ensure text readability */
+                                    .service-label {
+                                      background: rgba(0, 0, 0, 0.8);
+                                      padding: 4px 12px;
+                                      border-radius: 8px;
+                                      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+                                      backdrop-filter: blur(8px);
+                                    }
+                            
+                                    /* Prevent icon and text overlap on smaller screens */
+                                    @media (max-width: 640px) {
+                                      .service-label {
+                                        font-size: 0.75rem;
+                                        padding: 2px 8px;
+                                      }
+                                      
+                                      .orbit-container {
+                                        min-height: 500px;
+                                      }
+                                    }
+                            
+                                    /* Z-index hierarchy */
+                                    .orbit-container {
+                                      position: relative;
+                                      z-index: 1;
+                                    }
+                            
+                                    .planet-center {
+                                      position: relative;
+                                      z-index: 10;
+                                    }
+                            
+                                    .service-item {
+                                      position: relative;
+                                      z-index: 20;
+                                    }
+                            
+                                    .service-text {
+                                      position: relative;
+                                      z-index: 30;
+                                    }
+                            
+                                    /* Improved touch targets for mobile */
+                                    @media (hover: none) and (pointer: coarse) {
+                                      .service-icon-container {
+                                        min-width: 48px;
+                                        min-height: 48px;
+                                      }
+                                    }
+                            
+                                    /* Animation staggering for icons */
+                                    .service-item:nth-child(1) {
+                                      animation-delay: 0.1s;
+                                    }
+                                    
+                                    .service-item:nth-child(2) {
+                                      animation-delay: 0.2s;
+                                    }
+                                    
+                                    .service-item:nth-child(3) {
+                                      animation-delay: 0.3s;
+                                    }
+                                    
+                                    .service-item:nth-child(4) {
+                                      animation-delay: 0.4s;
+                                    }
+                                    
+                                    .service-item:nth-child(5) {
+                                      animation-delay: 0.5s;
+                                    }
+                            
+                                    /* Fade in animation */
+                                    @keyframes fadeInScale {
+                                      from {
+                                        opacity: 0;
+                                        transform: scale(0.8);
+                                      }
+                                      to {
+                                        opacity: 1;
+                                        transform: scale(1);
+                                      }
+                                    }
+                            
+                                    .fade-in-scale {
+                                      animation: fadeInScale 0.6s ease-out forwards;
+                                    }
+                                  `}</style>
+                                </div>
+                              );
                             }
-                            loading="lazy"
-                          />
-                        </div>
-                      </div>
-
-                      {/* النص */}
-                      <div className="text-center max-w-[150px]">
-                        <span
-                          className={`text-sm md:text-base text-[#ff883e] font-bold block mb-1 ${
-                            isRTL ? "font-cairo" : "font-roboto"
-                          }`}
-                        >
-                          {service.title}
-                        </span>
-                        <span
-                          className={`text-xs text-white/80 ${
-                            isRTL ? "font-cairo" : "font-inter"
-                          }`}
-                        >
-                          {service.shortDesc}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Ready to Get Started CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={heroInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="text-center mt-8"
-          >
-            <motion.a
-              href="https://wa.me/971504616041"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 bg-[#ff883e] hover:bg-[#ff883e] text-white px-8 py-4 rounded-full text-lg font-semibold shadow-2xl transition-all duration-300"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {content.ctaButton}
-              {isRTL ? <FaArrowLeft /> : <FaArrowRight />}
-            </motion.a>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* تعديل: استبدال قسم السلايدر بقسم Grid للصور */}
-      <section className="py-16 relative overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative max-w-6xl mx-auto px-4 md:px-8 z-10"
-        >
-          {/* تعديل: Grid layout للصور بدلاً من السلايدر */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sliderImages.map((image, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative group cursor-pointer overflow-hidden rounded-2xl shadow-xl"
-                onClick={() => openModal(image)} // تعديل: فتح المودال عند الضغط على الصورة
-              >
-                <img
-                  src={image}
-                  alt={`Service ${index + 1}`}
-                  className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
-                  onError={(e) => {
-                    e.target.src = "";
-                  }}
-                />
-                {/* <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" /> */}
-
-                {/* تعديل: إضافة أيقونة التكبير عند hover */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <FaSearchPlus className="text-white text-4xl drop-shadow-lg" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* تعديل: استخدام المودال الجديد بدون أزرار التنقل */}
-      <ImageModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        imageSrc={modalImageSrc}
-        currentIndex={0}
-        totalImages={1}
-        onNext={() => {}} // لا حاجة للتنقل
-        onPrev={() => {}} // لا حاجة للتنقل
-      />
-
-      {/* Services Details Section */}
-      <section ref={servicesRef} className="py-20 relative z-10">
-        <div className="container mx-auto px-4">
-    <motion.h2
-      initial={{ opacity: 0, y: -30 }}
-      animate={servicesInView ? { opacity: 1, y: 0 } : {}}
-      className={`text-3xl md:text-4xl font-bold text-center mb-12 text-white ${
-        isRTL ? "font-cairo" : "font-sora"
-      }`}
-    >
-      {isRTL ? "ماذا نفعل ؟" : "What we do ?"}
-    </motion.h2>
-
-    {/* الصف الأول - 3 كاردات */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-      {content.services.slice(0, 3).map((service, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 50 }}
-          animate={servicesInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: index * 0.1 }}
-          className="bg-[#1a1a1a]/80 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-[#ff883e]/20 group"
-        >
-          <motion.div className="h-full">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-14 h-14  rounded-full flex items-center justify-center transition-all duration-300">
-                <img
-                  src={service.icon}
-                  alt={service.title}
-                  className="w-8 h-8 object-contain"
-                  onError={(e) => handleImageError(e)}
-                />
-              </div>
-              <h3
-                className={`text-xl font-bold text-white flex-1 ${
-                  isRTL ? "font-cairo" : "font-roboto"
-                }`}
-              >
-                {service.title}
-              </h3>
-            </div>
-            <p
-              className={`text-white/70 leading-relaxed ${
-                isRTL ? "font-cairo" : "font-inter"
-              }`}
-            >
-              {service.description}
-            </p>
-          </motion.div>
-        </motion.div>
-      ))}
-    </div>
-
-    {/* الصف الثاني - 2 كاردات مع gap أكبر */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-24 max-w-5xl mx-auto">
-      {content.services.slice(3, 5).map((service, index) => (
-        <motion.div
-          key={index + 3}
-          initial={{ opacity: 0, y: 50 }}
-          animate={servicesInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: (index + 3) * 0.1 }}
-          className="bg-[#1a1a1a]/80 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-[#ff883e]/20 group"
-        >
-          <motion.div className="h-full">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-14 h-14  rounded-full flex items-center justify-center  transition-all duration-300">
-                <img
-                  src={service.icon}
-                  alt={service.title}
-                  className="w-8 h-8 object-contain"
-                  onError={(e) => handleImageError(e)}
-                />
-              </div>
-              <h3
-                className={`text-xl font-bold text-white flex-1 ${
-                  isRTL ? "font-cairo" : "font-roboto"
-                }`}
-              >
-                {service.title}
-              </h3>
-            </div>
-            <p
-              className={`text-white/70 leading-relaxed ${
-                isRTL ? "font-cairo" : "font-inter"
-              }`}
-            >
-              {service.description}
-            </p>
-          </motion.div>
-        </motion.div>
-      ))}
-    </div>
- 
-          {/* Bottom CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={servicesInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="mt-16 text-center"
-          >
-            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] p-12 rounded-3xl shadow-2xl border border-[#ff883e]/20">
-              <h3
-                className={`text-2xl md:text-3xl font-bold text-white mb-4 ${
-                  isRTL ? "font-cairo" : "font-sora"
-                }`}
-              >
-                {isRTL
-                  ? "دعنا نحول رؤيتك إلى واقع"
-                  : "Let's Transform Your Vision into Reality"}
-              </h3>
-              <p
-                className={`text-white/90 mb-8 max-w-2xl mx-auto ${
-                  isRTL ? "font-cairo" : "font-inter"
-                }`}
-              >
-                {isRTL
-                  ? "فريقنا من الخبراء جاهز لمساعدتك في تحقيق أهدافك التسويقية الرقمية"
-                  : "Our team of experts is ready to help you achieve your digital marketing goals"}
-              </p>
-              <motion.a
-                href="https://wa.me/971504616041"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-[#ff883e] hover:bg-[#ff6a2e] text-white px-8 py-4 rounded-full text-lg font-semibold shadow-xl transition-all duration-300"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {isRTL ? "تواصل معنا الآن" : "Contact Us Now"}
-                {isRTL ? <FaArrowLeft /> : <FaArrowRight />}
-              </motion.a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Decorative Elements */}
-      <div className="fixed bottom-0 left-0 right-0 h-32 pointer-events-none z-0">
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#ff883e] rounded-full blur-[150px] opacity-10" />
-      </div>
-
-      <Footer />
-
-      {/* Add custom styles for glassmorphism effect and other animations */}
-      <style jsx>{`
-        @supports (backdrop-filter: blur(10px)) or
-          (-webkit-backdrop-filter: blur(10px)) {
-          .glass-morphism {
-            background: rgba(26, 26, 26, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 136, 62, 0.2);
-          }
-        }
-
-        @supports not (backdrop-filter: blur(10px)) {
-          .glass-morphism {
-            background: rgba(26, 26, 26, 0.8);
-            border: 1px solid rgba(255, 136, 62, 0.3);
-          }
-        }
-
-        /* Animation for floating effect */
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-
-        .floating {
-          animation: float 3s ease-in-out infinite;
-        }
-
-        /* Gradient text effect */
-        .gradient-text {
-          background: linear-gradient(45deg, #ff883e, #ff7a28);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          text-fill-color: transparent;
-        }
-
-        /* Smooth scroll behavior */
-        html {
-          scroll-behavior: smooth;
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-          width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-          background: #1a1a1a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-          background: #ff883e;
-          border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-          background: #ff7a28;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-          .service-orbit {
-            transform: scale(0.8);
-          }
-        }
-
-        @media (max-width: 640px) {
-          .service-orbit {
-            transform: scale(0.65);
-          }
-        }
-
-        /* Modal animations */
-        .modal-content {
-          animation: modalSlideIn 0.3s ease-out;
-        }
-
-        @keyframes modalSlideIn {
-          from {
-            transform: scale(0.9);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-
-        /* Image hover effects */
-        .image-hover {
-          transition: all 0.3s ease;
-        }
-
-        .image-hover:hover {
-          transform: scale(1.05);
-        }
-
-        /* Grid image hover effect - تعديل: تأثيرات hover للصور في الجريد */
-        .grid-image-container {
-          position: relative;
-          overflow: hidden;
-          cursor: pointer;
-        }
-
-        .grid-image-container::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.3);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        .grid-image-container:hover::before {
-          opacity: 1;
-        }
-
-        /* Prevent image drag */
-        img {
-          -webkit-user-drag: none;
-          -khtml-user-drag: none;
-          -moz-user-drag: none;
-          -o-user-drag: none;
-          user-drag: none;
-        }
-
-        /* Modal overlay blur */
-        .modal-overlay {
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-        }
-
-        /* Zoom controls */
-        .zoom-controls {
-          position: fixed;
-          top: 20px;
-          left: 20px;
-          z-index: 60;
-        }
-
-        /* Image container for modal */
-        .modal-image-container {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-        }
-
-        /* Modal image styles */
-        .modal-image {
-          max-width: 90vw;
-          max-height: 90vh;
-          object-fit: contain;
-          cursor: grab;
-          user-select: none;
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-        }
-
-        .modal-image:active {
-          cursor: grabbing;
-        }
-
-        /* Touch device optimizations */
-        @media (hover: none) and (pointer: coarse) {
-          .modal-image {
-            touch-action: pinch-zoom;
-          }
-        }
-
-        /* Orbit animation */
-        @keyframes orbit {
-          from {
-            transform: rotate(0deg) translateX(200px) rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg) translateX(200px) rotate(-360deg);
-          }
-        }
-
-        .pulse-effect {
-          animation: pulse 2s infinite;
-        }
-
-        /* Glass morphism for Safari */
-        @supports (-webkit-backdrop-filter: blur(10px)) {
-          .glass-card {
-            -webkit-backdrop-filter: blur(10px);
-            backdrop-filter: blur(10px);
-          }
-        }
-
-        /* Enhanced focus states for accessibility */
-        button:focus-visible,
-        a:focus-visible {
-          outline: 2px solid #ff883e;
-          outline-offset: 2px;
-        }
-
-        /* Smooth transitions for all interactive elements */
-        button,
-        a,
-        .interactive {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Loading skeleton animation */
-        @keyframes shimmer {
-          0% {
-            background-position: -1000px 0;
-          }
-          100% {
-            background-position: 1000px 0;
-          }
-        }
-
-        .skeleton {
-          background: linear-gradient(
-            90deg,
-            #1a1a1a 0px,
-            #2a2a2a 40px,
-            #1a1a1a 80px
-          );
-          background-size: 1000px 100%;
-          animation: shimmer 2s infinite;
-        }
-
-        /* تعديل: أنماط إضافية للصور في الجريد */
-        .image-grid-item {
-          position: relative;
-          overflow: hidden;
-          border-radius: 1rem;
-          transition: all 0.3s ease;
-        }
-
-        .image-grid-item:hover {
-          transform: translateY(-5px);
-        }
-
-        .image-grid-item .zoom-icon {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          pointer-events: none;
-        }
-
-        .image-grid-item:hover .zoom-icon {
-          opacity: 1;
-        }
-
-        /* تعديل: Planet positioning adjustment */
-        .planet-container {
-          margin-top: 400px; /* نزول الكوكب 400 بكسل */
-        }
-
-        /* تعديل: Background gradient for entire page */
-        .page-background {
-          position: fixed;
-          inset: 0;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(255, 136, 62, 0.15) 0%,
-            #0a0a0a 50%,
-            #000000 100%
-          );
-          z-index: -1;
-        }
-
-        /* Responsive grid adjustments */
-        @media (max-width: 768px) {
-          .image-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (min-width: 769px) and (max-width: 1024px) {
-          .image-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        /* Modal click-to-close area */
-        .modal-backdrop {
-          cursor: pointer;
-        }
-
-        .modal-content-wrapper {
-          cursor: default;
-        }
-
-        /* Image zoom animation in modal */
-        @keyframes zoomIn {
-          from {
-            transform: scale(0.5);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-
-        .modal-image-zoom {
-          animation: zoomIn 0.3s ease-out;
-        }
-      `}</style>
-    </div>
-  );
-}

@@ -1,16 +1,16 @@
-'use client'
-
-import { useState, useEffect, useRef } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
-import { motion } from 'framer-motion';
-import { 
-  FaInstagram, 
+"use client";
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
+import { useLanguage } from "@/context/LanguageContext";
+import { motion } from "framer-motion";
+import {
+  FaInstagram,
   FaWhatsapp,
   FaEnvelope,
   FaTiktok,
-  FaLinkedinIn
-} from 'react-icons/fa';
-import '../../app/globals.css'; 
+  FaLinkedinIn,
+} from "react-icons/fa";
+import "../../app/globals.css";
 
 export default function HeroSection() {
   const { t, isRTL, language } = useLanguage(); // إضافة language
@@ -21,87 +21,95 @@ export default function HeroSection() {
   const [hasVideoError, setHasVideoError] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const videoRef = useRef(null);
-  
+
   // Check desktop device
   useEffect(() => {
     const checkDevice = () => {
-      setIsDesktop(window.innerWidth >= 1024); 
+      setIsDesktop(window.innerWidth >= 1024);
     };
-    
+
     checkDevice();
-    window.addEventListener('resize', checkDevice);
-    return () => window.removeEventListener('resize', checkDevice);
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
   // Services content with translations
-  const servicesContent = {
-    en: [
-      { key: 'it', label: 'Digital Marketing' },
-      { key: 'digitalMarketing', label: 'Influencer Strategy' },
-      { key: 'branding', label: 'Event Planning & Management' },
-      { key: 'socialMedia', label: 'Media' },
-    ],
-    ar: [
-      { key: 'it', label: 'التسويق الرقمي' },
-      { key: 'digitalMarketing', label: 'استراتيجية المؤثرين' },
-      { key: 'branding', label: 'تخطيط وإدارة الفعاليات' },
-      { key: 'socialMedia', label: 'الإعلام' },
-    ]
-  };
+ const servicesContent = {
+  en: [
+    { key: 'it', label: 'Digital Marketing', href: '/Digital-marketing' },
+    { key: 'digitalMarketing', label: 'Influencer Strategy', href: '/influencer' },
+    { key: 'branding', label: 'Event Planning & Management', href: '/Event' },
+    { key: 'socialMedia', label: 'Media', href: '/media' },
+  ],
+  ar: [
+    { key: 'it', label: 'التسويق الرقمي', href: '/Digital-marketing' },
+    { key: 'digitalMarketing', label: 'استراتيجية المؤثرين', href: '/influencer' },
+    { key: 'branding', label: 'تخطيط وإدارة الفعاليات', href: '/Event' },
+    { key: 'socialMedia', label: 'الإعلام', href: '/media' },
+  ]
+};
+
 
   // Get services based on current language - إذا لم يكن language متاح، استخدم isRTL
-  const services = language ? servicesContent[language] : (isRTL ? servicesContent.ar : servicesContent.en);
+  const services = language
+    ? servicesContent[language]
+    : isRTL
+    ? servicesContent.ar
+    : servicesContent.en;
 
   // Social links
   const socialLinks = [
-    { 
-      icon: FaInstagram, 
-      href: 'https://www.instagram.com/kafu.marketing?igsh=MWhidHlxYWs1NzN6bA%3D%3D&utm_source=qr', 
-      label: 'Instagram',
-      bgColor: 'bg-black/60',
-      textColor: 'text-pink-500 hover:text-pink-600' 
+    {
+      icon: FaInstagram,
+      href: "https://www.instagram.com/kafu.marketing?igsh=MWhidHlxYWs1NzN6bA%3D%3D&utm_source=qr",
+      label: "Instagram",
+      bgColor: "bg-black/60",
+      textColor: "text-pink-500 hover:text-pink-600",
     },
-    { 
-      icon: FaWhatsapp, 
-      href: 'https://wa.me/+971504616041', 
-      label: 'WhatsApp',
-      bgColor: 'bg-black/60',
-      textColor: 'text-green-500 hover:text-green-600'    
+    {
+      icon: FaWhatsapp,
+      href: "https://wa.me/+971504616041",
+      label: "WhatsApp",
+      bgColor: "bg-black/60",
+      textColor: "text-green-500 hover:text-green-600",
     },
-    { 
-      icon: FaEnvelope, 
-      href: isDesktop 
-        ? 'https://mail.google.com/mail/?view=cm&fs=1&to=marketingkafu@gmail.com'
-        : 'mailto:marketingkafu@gmail.com',
-      label: 'Email',
-      bgColor: 'bg-black/60',
-      textColor: 'text-orange-500 hover:text-orange-600'    
-    }, 
+    {
+      icon: FaEnvelope,
+      href: isDesktop
+        ? "https://mail.google.com/mail/?view=cm&fs=1&to=marketingkafu@gmail.com"
+        : "mailto:marketingkafu@gmail.com",
+      label: "Email",
+      bgColor: "bg-black/60",
+      textColor: "text-orange-500 hover:text-orange-600",
+    },
     {
       icon: FaTiktok,
-      href: 'https://www.tiktok.com/@kafu.marketing?_t=ZS-901OYIsjVxM&_r=1', 
-      label: 'TikTok',
-      bgColor: 'bg-black/60',
-      textColor: 'text-white hover:text-gray-300'
+      href: "https://www.tiktok.com/@kafu.marketing?_t=ZS-901OYIsjVxM&_r=1",
+      label: "TikTok",
+      bgColor: "bg-black/60",
+      textColor: "text-white hover:text-gray-300",
     },
     {
       icon: FaLinkedinIn,
-      href: 'https://www.linkedin.com/company/109021030/admin/page-posts/published/', 
-      label: 'LinkedIn',
-      bgColor: 'bg-black/60',
-      textColor: 'text-blue-500 hover:text-blue-600'
-    }
+      href: "https://www.linkedin.com/company/109021030/admin/page-posts/published/",
+      label: "LinkedIn",
+      bgColor: "bg-black/60",
+      textColor: "text-blue-500 hover:text-blue-600",
+    },
   ];
 
   // فحص دعم الفيديو والاتصال
   useEffect(() => {
     const checkVideoSupport = () => {
       const isMobile = window.innerWidth < 768;
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      
+      const connection =
+        navigator.connection ||
+        navigator.mozConnection ||
+        navigator.webkitConnection;
+
       // عدم تشغيل الفيديو على الاتصالات البطيئة
       if (connection && connection.effectiveType) {
-        const slowConnections = ['slow-2g', '2g'];
+        const slowConnections = ["slow-2g", "2g"];
         if (slowConnections.includes(connection.effectiveType)) {
           setShowVideo(false);
           return;
@@ -109,26 +117,29 @@ export default function HeroSection() {
       }
 
       // فحص دعم تنسيقات الفيديو
-      const video = document.createElement('video');
-      const canPlayWebM = video.canPlayType('video/webm').replace(/no/, '');
-      const canPlayMP4 = video.canPlayType('video/mp4').replace(/no/, '');
-      
+      const video = document.createElement("video");
+      const canPlayWebM = video.canPlayType("video/webm").replace(/no/, "");
+      const canPlayMP4 = video.canPlayType("video/mp4").replace(/no/, "");
+
       if (!canPlayWebM && !canPlayMP4) {
         setShowVideo(false);
         return;
       }
-      
+
       // تشغيل الفيديو بعد تأخير بسيط لتحسين الأداء
-      setTimeout(() => {
-        setShowVideo(true);
-      }, isMobile ? 2000 : 1000);
+      setTimeout(
+        () => {
+          setShowVideo(true);
+        },
+        isMobile ? 2000 : 1000
+      );
     };
 
     checkVideoSupport();
 
     // إعادة الفحص عند تغيير حجم الشاشة
-    window.addEventListener('resize', checkVideoSupport);
-    return () => window.removeEventListener('resize', checkVideoSupport);
+    window.addEventListener("resize", checkVideoSupport);
+    return () => window.removeEventListener("resize", checkVideoSupport);
   }, []);
 
   // مراقبة تحميل الفيديو
@@ -155,40 +166,39 @@ export default function HeroSection() {
 
       // معالجة الأخطاء
       const handleError = (e) => {
-        console.error('Video loading error:', e);
+        console.error("Video loading error:", e);
         setHasVideoError(true);
         setShowVideo(false);
       };
 
-      video.addEventListener('progress', handleProgress);
-      video.addEventListener('loadeddata', handleLoadedData);
-      video.addEventListener('error', handleError);
+      video.addEventListener("progress", handleProgress);
+      video.addEventListener("loadeddata", handleLoadedData);
+      video.addEventListener("error", handleError);
 
       // محاولة تشغيل الفيديو
-      video.play().catch(err => {
-        console.error('Video autoplay failed:', err);
+      video.play().catch((err) => {
+        console.error("Video autoplay failed:", err);
       });
 
       return () => {
-        video.removeEventListener('progress', handleProgress);
-        video.removeEventListener('loadeddata', handleLoadedData);
-        video.removeEventListener('error', handleError);
+        video.removeEventListener("progress", handleProgress);
+        video.removeEventListener("loadeddata", handleLoadedData);
+        video.removeEventListener("error", handleError);
       };
     }
   }, [showVideo]);
 
   return (
     <>
-      <section 
+      <section
         className="relative flex items-center overflow-hidden seamless-sections hero-section"
-        style={{ 
+        style={{
           minHeight: "100vh",
-          height: "100vh"
+          height: "100vh",
         }}
       >
         {/* طبقة الخلفية */}
         <div className="absolute inset-0 w-full h-full pointer-events-none">
-          
           {/* صورة Poster الأساسية (تظهر دائماً) */}
           <img
             src="/hero-poster.png"
@@ -203,7 +213,7 @@ export default function HeroSection() {
               <video
                 ref={videoRef}
                 className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 
-                  ${isVideoLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  ${isVideoLoaded ? "opacity-100" : "opacity-0"}`}
                 autoPlay
                 loop
                 muted
@@ -222,7 +232,7 @@ export default function HeroSection() {
               {/* شريط تقدم التحميل */}
               {!isVideoLoaded && loadingProgress < 100 && (
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-800/50">
-                  <motion.div 
+                  <motion.div
                     className="h-full bg-gradient-to-r from-orange-500 to-orange-600"
                     initial={{ width: 0 }}
                     animate={{ width: `${loadingProgress}%` }}
@@ -236,7 +246,9 @@ export default function HeroSection() {
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                   <div className="flex flex-col items-center gap-4">
                     <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-t-2 border-b-2 border-orange-500"></div>
-                    <p className="text-white/80 text-xs md:text-sm">{Math.round(loadingProgress)}%</p>
+                    <p className="text-white/80 text-xs md:text-sm">
+                      {Math.round(loadingProgress)}%
+                    </p>
                   </div>
                 </div>
               )}
@@ -245,7 +257,7 @@ export default function HeroSection() {
 
           {/* تدرج Overlay لتحسين قراءة النص */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-          
+
           {/* Overlay إضافي للجزء العلوي */}
           <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-black/50 to-transparent" />
         </div>
@@ -253,12 +265,13 @@ export default function HeroSection() {
         {/* المحتوى الرئيسي */}
         <div className="relative z-10 w-full h-full flex items-center px-4 sm:px-6 md:px-8 lg:px-10">
           <div className="w-full max-w-[1320px] mx-auto">
-            <div className={`max-w-full md:max-w-[600px] lg:max-w-[840px] ${
-              isRTL 
-                ? 'mr-auto md:mr-8 lg:mr-[120px] text-right' 
-                : 'ml-auto md:ml-8 lg:ml-[120px] text-left'
-            }`}>
-
+            <div
+              className={`max-w-full md:max-w-[600px] lg:max-w-[840px] ${
+                isRTL
+                  ? "mr-auto md:mr-8 lg:mr-[120px] text-right"
+                  : "ml-auto md:ml-8 lg:ml-[120px] text-left"
+              }`}
+            >
               {/* العنوان الرئيسي */}
               <motion.div
                 initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
@@ -266,16 +279,20 @@ export default function HeroSection() {
                 transition={{ duration: 0.8 }}
                 className="mb-6 md:mb-8 lg:mb-10"
               >
-                <div className={`${isRTL ? 'font-roboto text-right' : 'font-cairo text-left'}`}>
+                <div
+                  className={`${
+                    isRTL ? "font-roboto text-right" : "font-cairo text-left"
+                  }`}
+                >
                   {/* EXPLORE OUR */}
                   <motion.div
-                                      initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                     className="mb-1 md:mb-2"
                   >
                     <span className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-normal tracking-[0.15em] md:tracking-[0.2em] uppercase drop-shadow-lg">
-                      {isRTL ? 'اكتشف' : 'EXPLORE OUR'}
+                      {isRTL ? "اكتشف" : "EXPLORE OUR"}
                     </span>
                   </motion.div>
 
@@ -286,7 +303,7 @@ export default function HeroSection() {
                     transition={{ duration: 0.6, delay: 0.2 }}
                   >
                     <span className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase tracking-wide drop-shadow-xl">
-                      {isRTL ? 'عالمنا' : 'World'}
+                      {isRTL ? "عالمنا" : "World"}
                     </span>
                   </motion.div>
                 </div>
@@ -299,16 +316,23 @@ export default function HeroSection() {
                 }`}
               >
                 {services.map((service, index) => (
-                  <div
-                    key={service.key}
-                    className="px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5 text-xs sm:text-sm md:text-base font-medium rounded-lg bg-black/60 text-white/90 border border-white/10"
-                    style={{ cursor: "default" }}
-                  >
-                    {service.label}
-                  </div>
+                  <Link key={service.key} href={service.href}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                      whileHover={{
+                        scale: 1.05,
+                        boxShadow: "0 0 20px rgba(255, 255, 255, 0.3)",
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5 text-xs sm:text-sm md:text-base font-medium rounded-lg bg-black/60 text-white/90 border border-white/10 cursor-pointer transition-all duration-300 hover:bg-black/80 hover:text-white hover:border-white/30 backdrop-blur-sm"
+                    >
+                      {service.label}
+                    </motion.div>
+                  </Link>
                 ))}
               </div>
-
               {/* أيقونات وسائل التواصل الاجتماعي */}
               <motion.div
                 variants={{
@@ -324,7 +348,7 @@ export default function HeroSection() {
                 initial="hidden"
                 animate="show"
                 className={`flex gap-3 sm:gap-4 ${
-                  isRTL ? 'justify-end md:justify-start' : 'justify-start'
+                  isRTL ? "justify-end md:justify-start" : "justify-start"
                 }`}
               >
                 {socialLinks.map((social) => (
@@ -339,11 +363,11 @@ export default function HeroSection() {
                         opacity: 1,
                         y: 0,
                         scale: 1,
-                        transition: { 
-                          type: "spring", 
-                          stiffness: 300, 
-                          damping: 18, 
-                          duration: 0.3 
+                        transition: {
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 18,
+                          duration: 0.3,
                         },
                       },
                     }}
@@ -356,10 +380,8 @@ export default function HeroSection() {
                     whileTap={{ scale: 0.9 }}
                     className={`group relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center transition-all duration-200 ${social.bgColor} ${social.textColor} shadow-lg backdrop-blur-sm border border-white/10 hover:border-white/20`}
                   >
-                    <social.icon 
-                      className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-transform duration-200 group-hover:scale-110" 
-                    />
-                    
+                    <social.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-transform duration-200 group-hover:scale-110" />
+
                     {/* Tooltip - مخفي على الموبايل */}
                     <span className="hidden md:block absolute -top-10 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
                       {social.label}
@@ -367,7 +389,6 @@ export default function HeroSection() {
                   </motion.a>
                 ))}
               </motion.div>
-
             </div>
           </div>
         </div>
@@ -383,10 +404,9 @@ export default function HeroSection() {
               rgba(0,0,0,0.5) 50%,
               rgba(0,0,0,0.2) 75%,
               transparent 100%
-            )`
+            )`,
           }}
         />
-
       </section>
 
       {/* CSS إضافي للموبايل في global.css */}

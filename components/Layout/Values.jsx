@@ -51,11 +51,10 @@ export default function ValuesSection() {
         ref={sectionRef}
         className="relative overflow-hidden values-section "
       >
-        
         <div
           className="container-fluid  sm:px-6 md:px-8 lg:px-12 relative z-10 "
           style={{
-       background: `
+            background: `
   linear-gradient(135deg, rgba(232, 124, 57, 0.3) 0%, transparent 50%, rgba(196, 196, 196, 0.2) 100%),
   linear-gradient(45deg, transparent 30%, rgba(232, 124, 57, 0.15) 50%, transparent 70%),
   linear-gradient(-45deg, transparent 30%, rgba(196, 196, 196, 0.15) 50%, transparent 70%),
@@ -76,9 +75,7 @@ export default function ValuesSection() {
               className={`text-3xl  sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 py-12 text-white m-0
                 
                 
-                 ${
-                isRTL ? "font-cairo" : "font-sora"
-              }`}
+                 ${isRTL ? "font-cairo" : "font-sora"}`}
               style={{
                 textShadow:
                   "0 0 30px rgba(255,149,0,0.3), 0 0 60px rgba(255,149,0,0.1)",
@@ -86,26 +83,6 @@ export default function ValuesSection() {
             >
               {isRTL ? "قيمنا الأساسية" : "Our Values"}
             </h2>
-
-            <motion.a
-              href="https://wa.me/971504616041"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#FF883E] px-6 py-3 rounded-full text-white font-semibold hover:bg-[#FF7A28] transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                boxShadow:
-                  "0 10px 40px rgba(255,136,62,0.3), 0 20px 80px rgba(255,136,62,0.1)",
-              }}
-            >
-              {isRTL ? "المزيد من التفاصيل" : "MORE DETAIL"}
-              {isRTL ? (
-                <FaArrowLeft className="text-sm" />
-              ) : (
-                <FaArrowRight className="text-sm" />
-              )}
-            </motion.a>
           </motion.div>
 
           {/* Values Grid */}
@@ -176,22 +153,22 @@ export default function ValuesSection() {
         }}
        
       />  */}
-            <div
-        className="absolute bottom-0 left-0 right-0 h-24 z-20 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.02) 90%, transparent 100%)",
-          // boxShadow: "0 -10px 30px rgba(0,0,0,0.8)",
-        }}
-      />
-                        <div
-        className="absolute top-0 left-0 right-0 h-16 z-20 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(255,136,62,1) 0%, rgba(255,136,62,0.9) 10%, rgba(255,136,62,0.6) 25%, rgba(255,136,62,0.3) 45%, rgba(255,136,62,0.1) 70%, rgba(255,136,62,0.02) 90%, transparent 100%)",
-          // boxShadow: "0 -10px 30px rgba(0,0,0,0.8)",
-        }}
-      />
+        <div
+          className="absolute bottom-0 left-0 right-0 h-24 z-20 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.02) 90%, transparent 100%)",
+            // boxShadow: "0 -10px 30px rgba(0,0,0,0.8)",
+          }}
+        />
+        <div
+          className="absolute top-0 left-0 right-0 h-16 z-20 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(255,136,62,1) 0%, rgba(255,136,62,0.9) 10%, rgba(255,136,62,0.6) 25%, rgba(255,136,62,0.3) 45%, rgba(255,136,62,0.1) 70%, rgba(255,136,62,0.02) 90%, transparent 100%)",
+            // boxShadow: "0 -10px 30px rgba(0,0,0,0.8)",
+          }}
+        />
         <style jsx>
           {`
             .custom-shape-divider-top-1758594737 {
